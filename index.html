@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Standard diagram</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/diagram.css" rel="stylesheet">
+    <script src="lib/d3.min.js"></script>
+    <script src="js/standardDiagram.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <div id="standard-diagram"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+    StandardDiagram.getInstance()
+        .renderTo('#standard-diagram');
+    </script>
+</body>
+</html>

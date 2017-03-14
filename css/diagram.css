@@ -1,0 +1,11 @@
+svg.paint path.user-path {
+    stroke: darkorange;
+    stroke-dasharray: 5;
+    stroke-width: 2;
+    fill: none;
+}
+
+svg.paint circle.start-point {
+    fill: transparent;
+    cursor: pointer;
+}
