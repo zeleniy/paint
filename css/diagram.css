@@ -1,3 +1,7 @@
+svg.paint {
+    border: 1px solid black;
+}
+
 svg.paint path.user-path {
     stroke: darkorange;
     stroke-dasharray: 5;

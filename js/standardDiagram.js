@@ -63,7 +63,15 @@ function StandardDiagram() {
             self._dragStartEventHandler();
         }).on('drag', function() {
             self._dragEventHandler();
+        }).on('end', function() {
+            self._dragEndEventHandler();
         });
+    /**
+     * Is user finished?
+     * @private
+     * @member {Boolean}
+     */
+    this._isFinished = false;
     /**
      * SVG level x scale function.
      * @private
@@ -241,6 +249,12 @@ StandardDiagram.prototype.renderTo = function(selection) {
         .attr('r', 5)
         .call(this._dragHandler);
     /*
+     * Append button.
+     */
+    this._button = this._container.append()
+        .attr('class', 'btn btn-primary pull-right disabled')
+        .text('Show answer');
+    /*
      * Populate chart with data.
      */
     this._update(true);
@@ -272,7 +286,20 @@ StandardDiagram.prototype._setUpScaleDomains = function() {
  */
 StandardDiagram.prototype._dragStartEventHandler = function() {
 
+    this._isFinished = false;
     this._lineData = [];
+};
+
+
+/**
+ * Drag start event handler.
+ * @private
+ */
+StandardDiagram.prototype._dragEndEventHandler = function() {
+
+    if (this._isFinished === true) {
+        this._button.classed('disabled', false);
+    }
 };
 
 
@@ -285,7 +312,7 @@ StandardDiagram.prototype._dragEventHandler = function() {
      * Do nothing if user achieve right side.
      */
     if (this._imageXScale.invert(d3.event.x) >= this._image.endX) {
-        return;
+        return this._isFinished = true;
     }
     /*
      * Update only y coordinate if user try to draw in opposite direction.
