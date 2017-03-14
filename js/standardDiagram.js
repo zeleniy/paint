@@ -285,8 +285,17 @@ StandardDiagram.prototype._setUpScaleDomains = function() {
  * @private
  */
 StandardDiagram.prototype._dragStartEventHandler = function() {
-
+    /*
+     * Reset flag.
+     */
     this._isFinished = false;
+    /*
+     * Disable button.
+     */
+    this._button.classed('disabled', true);
+    /*
+     * Reset trace data.
+     */
     this._lineData = [];
 };
 
