@@ -28,7 +28,8 @@ function StandardDiagram() {
     this._image = {
         width: 4001,
         height: 2250,
-        src: 'img/Diagram 1_no line-01.png',
+        initialSrc: 'img/Diagram 1_no line-01.png',
+        answerSrc: 'img/Diagram 1.1.png',
         startPoint: [1055, 747],
         endX: 2305,
         element: d3.select()
@@ -240,7 +241,7 @@ StandardDiagram.prototype.renderTo = function(selection) {
      * Append background image.
      */
     this._image.element = this._svg.append('image')
-        .attr('xlink:href', this._image.src);
+        .attr('xlink:href', this._image.initialSrc);
     /*
      * Append start point.
      */
@@ -251,15 +252,37 @@ StandardDiagram.prototype.renderTo = function(selection) {
     /*
      * Append button.
      */
-    this._button = this._container.append()
-        .attr('class', 'btn btn-primary pull-right disabled')
-        .text('Show answer');
+    this._button = this._container.append('button')
+        .attr('class', 'btn btn-primary pull-right')
+        .style('visibility', 'hidden')
+        .text('Show answer')
+        .on('click', function() {
+            self.showAnswer();
+        });
     /*
      * Populate chart with data.
      */
     this._update(true);
 
     return this;
+};
+
+
+/**
+ * Show answer.
+ * @public
+ */
+StandardDiagram.prototype.showAnswer = function() {
+    /*
+     * Change background image.
+     */
+    this._image.element.attr('xlink:href', this._image.answerSrc);
+    /*
+     * Set default mouse cursor and remove drag event handling from start point.
+     */
+    this._start
+        .style('cursor', 'default')
+        .on(".drag", null);
 };
 
 
@@ -292,7 +315,7 @@ StandardDiagram.prototype._dragStartEventHandler = function() {
     /*
      * Disable button.
      */
-    this._button.classed('disabled', true);
+    this._button.style('visibility', 'hidden');
     /*
      * Reset trace data.
      */
@@ -307,7 +330,7 @@ StandardDiagram.prototype._dragStartEventHandler = function() {
 StandardDiagram.prototype._dragEndEventHandler = function() {
 
     if (this._isFinished === true) {
-        this._button.classed('disabled', false);
+        this._button.style('visibility', 'visible');
     }
 };
 
