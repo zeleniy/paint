@@ -7,6 +7,7 @@ svg.paint path.user-path {
     stroke-dasharray: 5;
     stroke-width: 2;
     fill: none;
+    pointer-events: none;
 }
 
 svg.paint circle.start-point {

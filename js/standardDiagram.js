@@ -313,13 +313,20 @@ StandardDiagram.prototype._dragStartEventHandler = function() {
      */
     this._isFinished = false;
     /*
+     * Reset x max value.
+     */
+    this._xMax = 0;
+    /*
      * Disable button.
      */
     this._button.style('visibility', 'hidden');
     /*
      * Reset trace data.
      */
-    this._lineData = [];
+    this._lineData = [{
+        x: this._imageXScale(this._image.startPoint[0]),
+        y: this._imageYScale(this._image.startPoint[1])
+    }];
 };
 
 
