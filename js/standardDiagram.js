@@ -9,12 +9,6 @@ function StandardDiagram() {
      */
     var self = this;
     /**
-     * Chart unique id.
-     * @private
-     * @member {String}
-     */
-    this._id = this._getUniqueId();
-    /**
      * Chart top level container.
      * @private
      * @member {d3.selection}
@@ -90,13 +84,13 @@ function StandardDiagram() {
      * @private
      * @member {Function}
      */
-    this._imageXScale = d3.scaleLinear();
+    this._imgXScale = d3.scaleLinear();
     /**
      * Image level y scale function.
      * @private
      * @member {Function}
      */
-    this._imageYScale = d3.scaleLinear();
+    this._imgYScale = d3.scaleLinear();
     /**
      * Chart default options.
      * @private
@@ -109,7 +103,7 @@ function StandardDiagram() {
     /*
      * Register window resize event handler.
      */
-    d3.select(window).on('resize.' + this._id, function() {
+    d3.select(window).on('resize.' + this._getUniqueId(), function() {
         self._resize();
         self._update();
     });
@@ -126,28 +120,6 @@ function StandardDiagram() {
 StandardDiagram.getInstance = function(config) {
 
     return new StandardDiagram(config);
-};
-
-
-/**
- * Set chart margin.
- * @public
- * @param {Object|Number} margin
- * @returns {StandardDiagram}
- */
-StandardDiagram.prototype.setMargin = function(margin) {
-
-    if (margin instanceof Object) {
-        for (var i in margin) {
-            this._margin[i] = margin[i];
-        }
-    } else {
-        for (var i in this._margin) {
-            this._margin[i] = margin;
-        }
-    }
-
-    return this;
 };
 
 
@@ -169,8 +141,8 @@ StandardDiagram.prototype._resize = function(dimension) {
     /*
      * Configure scale functions.
      */
-    this._imageXScale.range([0, this._outerWidth]);
-    this._imageYScale.range([0, this._outerHeight]);
+    this._imgXScale.range([0, this._outerWidth]);
+    this._imgYScale.range([0, this._outerHeight]);
     this._svgXScale.range([0, this._outerWidth]);
     this._svgYScale.range([0, this._outerHeight])
 };
@@ -187,19 +159,21 @@ StandardDiagram.prototype._update = function() {
     this._svg
         .attr('width', this._outerWidth)
         .attr('height', this._outerHeight);
-
+    /*
+     * Resize background image.
+     */
     this._image.element
         .attr('width', this._outerWidth)
         .attr('height', this._outerHeight);
-
+    /*
+     * Move start point.
+     */
     this._start
-        .attr('cx', this._imageXScale(this._image.startPoint[0]))
-        .attr('cy', this._imageYScale(this._image.startPoint[1]));
-
-    this._end
-        .attr('cx', this._imageXScale(2305))
-        .attr('cy', this._imageYScale(747));
-
+        .attr('cx', this._imgXScale(this._image.startPoint[0]))
+        .attr('cy', this._imgYScale(this._image.startPoint[1]));
+    /*
+     * Redraw line.
+     */
     this._redrawLine();
 };
 
@@ -293,8 +267,8 @@ StandardDiagram.prototype._setUpScaleDomains = function() {
     /*
      * Configure image scale functions.
      */
-    this._imageXScale.domain([0, this._image.width]);
-    this._imageYScale.domain([0, this._image.height]);
+    this._imgXScale.domain([0, this._image.width]);
+    this._imgYScale.domain([0, this._image.height]);
     /*
      * Configure svg scale functions.
      */
@@ -324,8 +298,8 @@ StandardDiagram.prototype._dragStartEventHandler = function() {
      * Reset trace data.
      */
     this._lineData = [{
-        x: this._imageXScale(this._image.startPoint[0]),
-        y: this._imageYScale(this._image.startPoint[1])
+        x: this._imgXScale(this._image.startPoint[0]),
+        y: this._imgYScale(this._image.startPoint[1])
     }];
 };
 
@@ -350,7 +324,7 @@ StandardDiagram.prototype._dragEventHandler = function() {
     /*
      * Do nothing if user achieve right side.
      */
-    if (this._imageXScale.invert(d3.event.x) >= this._image.endX) {
+    if (this._imgXScale.invert(d3.event.x) >= this._image.endX) {
         return this._isFinished = true;
     }
     /*
