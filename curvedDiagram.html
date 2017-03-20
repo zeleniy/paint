@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Curved diagram</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/diagram.css" rel="stylesheet">
+    <script src="lib/d3.min.js"></script>
+    <script src="js/diagram.js"></script>
+    <script src="js/curvedDiagram.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <div id="curved-diagram"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+    CurvedDiagram.getInstance()
+        .renderTo('#curved-diagram');
+    </script>
+</body>
+</html>
