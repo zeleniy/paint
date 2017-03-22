@@ -57,31 +57,22 @@ CurvedDiagram.getInstance = function(config) {
  */
 CurvedDiagram.prototype._dragEventHandler = function() {
     /*
-     * Do nothing if user achieve right side.
+     * Do nothing if user achieve right or bottom side.
      */
     if (this._imgXScale.invert(d3.event.x) >= this._endX || this._imgYScale.invert(d3.event.y) >= this._endY) {
         return this._isFinished = true;
     }
     /*
-     * Update only x or y coordinate if user try to draw in opposite direction.
+     * Update only y coordinate if user try to draw in opposite direction.
      */
-    if ((this._xMax >= d3.event.x && this._lineData.length) || (this._yMax >= d3.event.y && this._lineData.length)) {
-
-        if (this._xMax >= d3.event.x && this._lineData.length) {
-            this._lineData[this._lineData.length - 1].y = d3.event.y;
-        }
-
-        if (this._yMax >= d3.event.y && this._lineData.length) {
-            this._lineData[this._lineData.length - 1].x = d3.event.x;
-        }
-
+    if (this._xMax >= d3.event.x && this._lineData.length) {
+        this._lineData[this._lineData.length - 1].y = d3.event.y;
         return this._redrawLine();
     }
     /*
      * Update rightmost position where user was.
      */
     this._xMax = d3.event.x;
-    this._yMax = d3.event.y;
     /*
      * Add new point to the line data set.
      */
