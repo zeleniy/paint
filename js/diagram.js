@@ -173,6 +173,9 @@ Diagram.prototype._update = function() {
     this._image
         .attr('width', this._outerWidth)
         .attr('height', this._outerHeight);
+    this._image2
+        .attr('width', this._outerWidth)
+        .attr('height', this._outerHeight);
     /*
      * Move start point.
      */
@@ -224,6 +227,7 @@ Diagram.prototype.renderTo = function(selection) {
      */
     this._image = this._svg.append('image')
         .attr('xlink:href', this._images[0]);
+    this._image2 = this._svg.append('image');
     /*
      * Append start point.
      */
@@ -258,7 +262,7 @@ Diagram.prototype.showAnswer = function() {
     /*
      * Change background image.
      */
-    this._image.attr('xlink:href', this._images[1]);
+    this._image2.attr('xlink:href', this._images[1]);
     /*
      * Set default mouse cursor and remove drag event handling from start point.
      */

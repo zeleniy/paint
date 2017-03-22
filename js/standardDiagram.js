@@ -14,8 +14,8 @@ function StandardDiagram() {
      * @member {String}
      */
     this._images = [
-        'img/Diagram 1_no line-01.png',
-        'img/Diagram 1.1.png'
+        'img2/Diagram 1_no line.png',
+        'img/Correct line_diagram 1.1.png'
     ];
     /**
      * Pointer max x coordinate.
