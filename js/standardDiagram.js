@@ -13,7 +13,7 @@ function StandardDiagram() {
      * @private
      * @member {String}
      */
-    this._images = [
+    this._imagesLinks = [
         'img2/Diagram 1_no line.png',
         'img/Correct line_diagram 1.1.png'
     ];
@@ -23,6 +23,10 @@ function StandardDiagram() {
      * @member {Number}
      */
     this._endX = 2305;
+    /*
+     * Preload images.
+     */
+    this._preload();
 }
 
 /*
@@ -42,6 +46,37 @@ StandardDiagram.prototype = Object.create(Diagram.prototype);
 StandardDiagram.getInstance = function(config) {
 
     return new StandardDiagram(config);
+};
+
+
+/**
+ * Get answer image URL.
+ * @public
+ * @override
+ * @returns {String}
+ */
+StandardDiagram.prototype.getAnswerImage = function() {
+
+    return this._imagesLinks[1];
+};
+
+
+/**
+ * Render chart.
+ * @public
+ * @override
+ * @param {String} selection
+ * @returns {Diagram}
+ */
+StandardDiagram.prototype.renderTo = function(selection) {
+    /*
+     * Call parent method.
+     */
+    Diagram.prototype.renderTo.call(this, selection);
+    /*
+     * Enable painting.
+     */
+    this.enablePainting();
 };
 
 

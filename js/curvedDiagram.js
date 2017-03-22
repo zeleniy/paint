@@ -13,9 +13,9 @@ function CurvedDiagram() {
      * @private
      * @member {String}
      */
-    this._images = [
-        'img/Diagram 1_no line-01.png',
-        'img/Diagram 1.2.png'
+    this._imagesLinks = [
+        'img2/Diagram 1_no line.png',
+        'img/Correct line_diagram 1.2.png'
     ];
     /**
      * Pointer max x coordinate.
@@ -29,6 +29,10 @@ function CurvedDiagram() {
      * @member {Number}
      */
     this._endY = 2005;
+    /*
+     * Preload images.
+     */
+    this._preload();
 }
 
 /*
@@ -48,6 +52,37 @@ CurvedDiagram.prototype = Object.create(Diagram.prototype);
 CurvedDiagram.getInstance = function(config) {
 
     return new CurvedDiagram(config);
+};
+
+
+/**
+ * Get answer image URL.
+ * @public
+ * @override
+ * @returns {String}
+ */
+CurvedDiagram.prototype.getAnswerImage = function() {
+
+    return this._imagesLinks[1];
+};
+
+
+/**
+ * Render chart.
+ * @public
+ * @override
+ * @param {String} selection
+ * @returns {Diagram}
+ */
+CurvedDiagram.prototype.renderTo = function(selection) {
+    /*
+     * Call parent method.
+     */
+    Diagram.prototype.renderTo.call(this, selection);
+    /*
+     * Enable painting.
+     */
+    this.enablePainting();
 };
 
 

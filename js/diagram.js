@@ -25,11 +25,11 @@ function Diagram() {
         startPoint: [1055, 747]
     };
     /**
-     * Image selection.
+     * Main image selection.
      * @private
-     * @member {d3.selection}
+     * @member {d3.selection[]}
      */
-    this._image = d3.select();
+    this._images = [];
     /**
      * Pointer max x position.
      * @private
@@ -75,6 +75,13 @@ function Diagram() {
      * @member {Boolean}
      */
     this._isFinished = false;
+    /**
+     * Required images amount.
+     * By default equals to 2 - one for main and one for answer.
+     * @protected
+     * @member {Integer}
+     */
+    this._requiredImagesAmount = 2;
     /**
      * SVG level x scale function.
      * @private
@@ -132,6 +139,21 @@ Diagram.getInstance = function(config) {
 
 
 /**
+ * Preload all images.
+ * @protected
+ */
+Diagram.prototype._preload = function() {
+    /*
+     * 
+     */
+    this._imagesLinks.forEach(function(url) {
+        var image = new Image();
+        image.src = url;
+    })
+};
+
+
+/**
  * Set up chart dimensions.
  * @private
  * @param {Object} dimension
@@ -170,12 +192,11 @@ Diagram.prototype._update = function() {
     /*
      * Resize background image.
      */
-    this._image
-        .attr('width', this._outerWidth)
-        .attr('height', this._outerHeight);
-    this._image2
-        .attr('width', this._outerWidth)
-        .attr('height', this._outerHeight);
+    this._images.forEach(function(image) {
+        image
+            .attr('width', this._outerWidth)
+            .attr('height', this._outerHeight);
+    }, this);
     /*
      * Move start point.
      */
@@ -225,16 +246,21 @@ Diagram.prototype.renderTo = function(selection) {
     /*
      * Append background image.
      */
-    this._image = this._svg.append('image')
-        .attr('xlink:href', this._images[0]);
-    this._image2 = this._svg.append('image');
+    for (var i = 0; i < this._requiredImagesAmount; i ++) {
+        var image = this._svg.append('image');
+
+        if (i == 0) {
+            image.attr('xlink:href', this._imagesLinks[0]);
+        }
+
+        this._images.push(image);
+    }
     /*
      * Append start point.
      */
     this._start = this._svg.append('circle')
         .attr('class', 'start-point')
-        .attr('r', 5)
-        .call(this._dragHandler);
+        .attr('r', 5);
     /*
      * Append button.
      */
@@ -255,6 +281,35 @@ Diagram.prototype.renderTo = function(selection) {
 
 
 /**
+ * Enable paint mode.
+ * @public
+ */
+Diagram.prototype.enablePainting = function() {
+    /*
+     * Append start point.
+     */
+    this._start.call(this._dragHandler);
+    /*
+     * Set default mouse cursor and remove drag event handling from start point.
+     */
+    this._start.style('cursor', 'pointer');
+
+};
+
+
+/**
+ * Get answer image URL.
+ * @abstarct
+ * @public
+ * @returns {String}
+ */
+Diagram.prototype.getAnswerImage = function() {
+
+    throw new Error('#getAnswerImage method not implemented');
+};
+
+
+/**
  * Show answer.
  * @public
  */
@@ -262,7 +317,7 @@ Diagram.prototype.showAnswer = function() {
     /*
      * Change background image.
      */
-    this._image2.attr('xlink:href', this._images[1]);
+    this._images[1].attr('xlink:href', this.getAnswerImage());
     /*
      * Set default mouse cursor and remove drag event handling from start point.
      */

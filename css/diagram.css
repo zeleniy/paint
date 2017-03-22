@@ -12,5 +12,4 @@ svg.paint path.user-path {
 
 svg.paint circle.start-point {
     fill: transparent;
-    cursor: pointer;
 }
