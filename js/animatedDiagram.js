@@ -131,14 +131,17 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
     /*
      * Render scroll.
      */
-    this._scrollBackground = this._svg.append('rect')
+    this._scrollContainer = this._svg.append('g')
+        .attr('class', 'scroll-container')
+        .style('opacity', 1);
+    this._scrollBackground = this._scrollContainer.append('rect')
         .attr('class', 'scroll-background')
         .attr('x', this._width - 150 - 10)
         .attr('y', this._height - 150 - 10)
         .attr('width', 150)
         .attr('height', 150)
         .style('fill', '#3498db');
-    this._scroll = this._svg.append('rect')
+    this._scroll = this._scrollContainer.append('rect')
         .attr('class', 'scroll')
         .attr('x', this._width - 95 - 10)
         .attr('y', this._height - 110 - 10)
@@ -148,13 +151,13 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
         .style('fill', '#3498db')
         .style('stroke', '#fff')
         .style('stroke-width', 1);
-    this._scrollPointer = this._svg.append('circle')
+    this._scrollPointer = this._scrollContainer.append('circle')
         .attr('class', 'scroll-pointer')
         .attr('cx', this._width - 75 - 10)
         .attr('cy', this._height - 100 - 10)
         .attr('r', 5)
         .style('fill', '#fff');
-    this._scrollText = this._svg.append('text')
+    this._scrollText = this._scrollContainer.append('text')
         .attr('class', 'scroll-text')
         .text('"SCROLL" FOR Å BØYE TIDROM');
     /*
@@ -203,6 +206,14 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
                     .transition()
                     .duration(1500)
                     .style('opacity', 1);
+                /*
+                 * Also gradually hide and then remove scroll icon.
+                 */
+                self._scrollContainer
+                    .transition()
+                    .duration(1500)
+                    .style('opacity', 0)
+                    .remove();
                 /*
                  * Enable painting.
                  */
