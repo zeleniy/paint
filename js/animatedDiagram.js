@@ -38,7 +38,7 @@ function AnimatedDiagram() {
      * @private
      * @member {Integer}
      */
-    this._step = 100;
+    this._step = 80;
     /**
      * Virtual y offset.
      * @private
