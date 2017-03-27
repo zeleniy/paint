@@ -15,11 +15,11 @@ function AnimatedDiagram() {
      */
     this._imagesLinks = [
         'img2/Diagram 1_no line.png',
-        'img/Warped diagram 1.png',
-        'img/Warped diagram 2.png',
+        'img2/Warped diagram 1.png',
+        'img2/Warped diagram 2.png',
         'img2/Warped diagram 3.png',
         'img2/Correct line 1_Warped diagram.png',
-        'img2/Warped diagram 3_no line.png'
+        'img2/Faded straigth diagram-01.png'
     ];
     /**
      * Pointer max x coordinate.
@@ -143,13 +143,7 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
                     .attr('xlink:href', self._imagesLinks[5])
                     .transition()
                     .duration(1500)
-                    .style('opacity', 1)
-                    .on('end', function() {
-                      /*
-                       * Remove original background image at the end of transition.
-                       */
-                      self._images[0].remove();
-                    });
+                    .style('opacity', 1);
                 /*
                  * Enable painting.
                  */
