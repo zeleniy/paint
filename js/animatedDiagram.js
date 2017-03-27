@@ -109,6 +109,14 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
      */
     this._svg.on('wheel', function() {
         /*
+         * Prevent mousewheel event default behaviour. Necessary because of Safari bug.
+         * See for details:
+         * - https://github.com/jquery/jquery-mousewheel
+         * - https://github.com/jquery/jquery-mousewheel/issues/156#issuecomment-185433754
+         * - https://bugs.webkit.org/show_bug.cgi?id=149526
+         */
+        d3.event.preventDefault();
+        /*
          * Calculate y offset. It should be restricted between 0 and 'step * size(this._imagesLinks)'
          */
         self._yOffset = Math.min(self._step * (self._imagesLinks.length - 3), Math.max(0, self._yOffset + d3.event.deltaY));
