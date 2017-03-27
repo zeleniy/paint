@@ -184,15 +184,15 @@ Diagram.prototype._resize = function(dimension) {
     /*
      * Define outer dimensions.
      */
-    this._outerWidth  = dimension.width || this._defaults.width;
-    this._outerHeight = this._outerWidth * this._imageData.height / this._imageData.width;
+    this._width  = dimension.width || this._defaults.width;
+    this._height = this._width * this._imageData.height / this._imageData.width;
     /*
      * Configure scale functions.
      */
-    this._imgXScale.range([0, this._outerWidth]);
-    this._imgYScale.range([0, this._outerHeight]);
-    this._svgXScale.range([0, this._outerWidth]);
-    this._svgYScale.range([0, this._outerHeight])
+    this._imgXScale.range([0, this._width]);
+    this._imgYScale.range([0, this._height]);
+    this._svgXScale.range([0, this._width]);
+    this._svgYScale.range([0, this._height])
 };
 
 
@@ -205,15 +205,15 @@ Diagram.prototype._update = function() {
      * Resize SVG element.
      */
     this._svg
-        .attr('width', this._outerWidth)
-        .attr('height', this._outerHeight);
+        .attr('width', this._width)
+        .attr('height', this._height);
     /*
      * Resize background image.
      */
     this._images.forEach(function(image) {
         image
-            .attr('width', this._outerWidth)
-            .attr('height', this._outerHeight);
+            .attr('width', this._width)
+            .attr('height', this._height);
     }, this);
     /*
      * Move start point.
@@ -289,10 +289,6 @@ Diagram.prototype.renderTo = function(selection) {
         .on('click', function() {
             self.showAnswer();
         });
-    /*
-     * Populate chart with data.
-     */
-    this._update(true);
 
     return this;
 };
@@ -357,8 +353,8 @@ Diagram.prototype._setUpScaleDomains = function() {
     /*
      * Configure svg scale functions.
      */
-    this._svgXScale.domain([0, this._outerWidth]);
-    this._svgYScale.domain([0, this._outerHeight])
+    this._svgXScale.domain([0, this._width]);
+    this._svgYScale.domain([0, this._height])
 };
 
 

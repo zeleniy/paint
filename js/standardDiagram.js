@@ -68,6 +68,10 @@ StandardDiagram.prototype.renderTo = function(selection) {
      */
     Diagram.prototype.renderTo.call(this, selection);
     /*
+     * Populate chart with data.
+     */
+    this._update(true);
+    /*
      * Enable painting.
      */
     this.enablePainting();

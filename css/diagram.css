@@ -13,3 +13,23 @@ svg.paint path.user-path {
 svg.paint circle.start-point {
     fill: transparent;
 }
+
+svg.paint text.scroll-text {
+    text-anchor: middle;
+}
+
+svg.paint circle.scroll-pointer {
+    animation-duration: 1.5s;
+    animation-iteration-count: infinite;
+    animation-name: scroll;
+}
+
+@keyframes scroll {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+}

@@ -88,6 +88,34 @@ AnimatedDiagram.prototype.getAnswerImage = function() {
 };
 
 
+AnimatedDiagram.prototype._update = function() {
+    /*
+     * Call parent method.
+     */
+    Diagram.prototype._update.call(this);
+    /*
+     * Resize scroll icon.
+     */
+    var offset = 50;
+    this._scrollBackground
+        .attr('x', this._width - 120 - offset)
+        .attr('y', this._height - 120 - offset)
+        .attr('width', 120)
+        .attr('height', 120);
+    this._scroll
+        .attr('x', this._width - 80 - offset)
+        .attr('y', this._height - 95 - offset)
+        .attr('width', 40)
+        .attr('height', 70);
+    this._scrollPointer
+        .attr('cx', this._width - 60 - offset)
+        .attr('cy', this._height - 85 - offset);
+    this._scrollText
+        .attr('x', this._width - 60 - offset)
+        .attr('y', this._height - 135 - offset);
+};
+
+
 /**
  * Render chart.
  * @public
@@ -100,6 +128,35 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
      * Call parent method.
      */
     Diagram.prototype.renderTo.call(this, selection);
+    /*
+     * Render scroll.
+     */
+    this._scrollBackground = this._svg.append('rect')
+        .attr('class', 'scroll-background')
+        .attr('x', this._width - 150 - 10)
+        .attr('y', this._height - 150 - 10)
+        .attr('width', 150)
+        .attr('height', 150)
+        .style('fill', '#3498db');
+    this._scroll = this._svg.append('rect')
+        .attr('class', 'scroll')
+        .attr('x', this._width - 95 - 10)
+        .attr('y', this._height - 110 - 10)
+        .attr('width', 40)
+        .attr('height', 70)
+        .attr('ry', 20)
+        .style('fill', '#3498db')
+        .style('stroke', '#fff')
+        .style('stroke-width', 1);
+    this._scrollPointer = this._svg.append('circle')
+        .attr('class', 'scroll-pointer')
+        .attr('cx', this._width - 75 - 10)
+        .attr('cy', this._height - 100 - 10)
+        .attr('r', 5)
+        .style('fill', '#fff');
+    this._scrollText = this._svg.append('text')
+        .attr('class', 'scroll-text')
+        .text('"SCROLL" FOR Å BØYE TIDROM');
     /*
      * Stash reference to this object.
      */
@@ -152,5 +209,9 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
                 self.enablePainting();
             }
         }
-    })
+    });
+    /*
+     * Populate chart with data.
+     */
+    this._update(true);
 };
