@@ -115,6 +115,24 @@ function Diagram() {
         width : 400,
         height: 300
     };
+    /**
+     * Pointer max x coordinate.
+     * @protected
+     * @member {Number}
+     */
+    this._endX = 2305;
+    /**
+     * Pointer min y coordinate.
+     * @protected
+     * @member {Number}
+     */
+    this._topY = 150;
+    /**
+     * Pointer max y coordinate.
+     * @protected
+     * @member {Number}
+     */
+    this._bottomY = 2005;
     /*
      * Register window resize event handler.
      */
@@ -346,7 +364,7 @@ Diagram.prototype._setUpScaleDomains = function() {
 
 /**
  * Drag start event handler.
- * @private
+ * @protected
  */
 Diagram.prototype._dragStartEventHandler = function() {
     /*
@@ -373,8 +391,57 @@ Diagram.prototype._dragStartEventHandler = function() {
 
 
 /**
- * Drag start event handler.
+ * Drag event handler.
+ * @protected
+ */
+Diagram.prototype._dragEventHandler = function() {
+    /*
+     * Check border "violence". If user crossed border - stop painting.
+     */
+    if (this._isBorderCrossed()) {
+        return this._isFinished = true;
+    }
+    /*
+     * Update only y coordinate if user try to draw in opposite direction.
+     */
+    if (this._xMax >= d3.event.x && this._lineData.length) {
+        this._lineData[this._lineData.length - 1].y = d3.event.y;
+        return this._redrawLine();
+    }
+    /*
+     * Update rightmost position where user was.
+     */
+    this._xMax = d3.event.x;
+    /*
+     * Add new point to the line data set.
+     */
+    this._lineData.push({
+        x : d3.event.x,
+        y : d3.event.y
+    });
+    /*
+     * Redraw line.
+     */
+    this._redrawLine();
+};
+
+
+/**
+ * Is user cross border?
  * @private
+ * @returns {Boolean}
+ */
+Diagram.prototype._isBorderCrossed = function() {
+
+    return this._imgXScale.invert(d3.event.x) >= this._endX ||
+        this._imgYScale.invert(d3.event.y) >= this._bottomY ||
+        this._imgYScale.invert(d3.event.y) <= this._topY;
+};
+
+
+/**
+ * Drag start event handler.
+ * @protected
  */
 Diagram.prototype._dragEndEventHandler = function() {
 
