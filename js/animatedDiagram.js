@@ -143,7 +143,13 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
                     .attr('xlink:href', self._imagesLinks[5])
                     .transition()
                     .duration(1500)
-                    .style('opacity', 1);
+                    .style('opacity', 1)
+                    .on('end', function() {
+                      /*
+                       * Remove original background image at the end of transition.
+                       */
+                      self._images[0].remove();
+                    });
                 /*
                  * Enable painting.
                  */
