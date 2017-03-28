@@ -34,12 +34,11 @@ CurvedDiagram.prototype = Object.create(Diagram.prototype);
  * Factory method.
  * @public
  * @static
- * @param {Object} config
  * @returns {CurvedDiagram}
  */
-CurvedDiagram.getInstance = function(config) {
+CurvedDiagram.getInstance = function() {
 
-    return new CurvedDiagram(config);
+    return new CurvedDiagram();
 };
 
 

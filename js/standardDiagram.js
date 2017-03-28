@@ -34,12 +34,11 @@ StandardDiagram.prototype = Object.create(Diagram.prototype);
  * Factory method.
  * @public
  * @static
- * @param {Object} config
  * @returns {StandardDiagram}
  */
-StandardDiagram.getInstance = function(config) {
+StandardDiagram.getInstance = function() {
 
-    return new StandardDiagram(config);
+    return new StandardDiagram();
 };
 
 

@@ -9,19 +9,6 @@ function AnimatedDiagram() {
      */
     Diagram.call(this);
     /**
-     * Images urls.
-     * @private
-     * @member {String}
-     */
-    this._imagesLinks = [
-        'img2/Diagram 1_no line.png',
-        'img2/Warped diagram 1.png',
-        'img2/Warped diagram 2.png',
-        'img2/Warped diagram 3.png',
-        'img2/Correct line 1_Warped diagram.png',
-        'img2/Faded straigth diagram-01.png'
-    ];
-    /**
      * Pointer max x coordinate.
      * @private
      * @member {Number}
@@ -67,12 +54,11 @@ AnimatedDiagram.prototype = Object.create(Diagram.prototype);
  * Factory method.
  * @public
  * @static
- * @param {Object} config
  * @returns {AnimatedDiagram}
  */
-AnimatedDiagram.getInstance = function(config) {
+AnimatedDiagram.getInstance = function() {
 
-    return new AnimatedDiagram(config);
+    return new AnimatedDiagram();
 };
 
 
