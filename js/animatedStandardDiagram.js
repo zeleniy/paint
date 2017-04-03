@@ -8,12 +8,12 @@ function AnimatedStandardDiagram() {
      * @member {String[]}
      */
     this._imagesLinks = [
-        'img2/Diagram 1_no line.png',
-        'img2/Warped diagram 1.png',
-        'img2/Warped diagram 2.png',
-        'img2/Warped diagram 3.png',
-        'img2/Correct line 2_Warped diagram.png',
-        'img2/Faded straigth diagram-01.png'
+        'img/Diagram 1_no line.png',
+        'img/Warped diagram 1.png',
+        'img/Warped diagram 2.png',
+        'img/Warped diagram 3.png',
+        'img/Correct line 2_Warped diagram.png',
+        'img/Faded straigth diagram-01.png'
     ];
     /*
      * Call parent class constructor.

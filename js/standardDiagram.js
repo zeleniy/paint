@@ -14,7 +14,7 @@ function StandardDiagram() {
      * @member {String}
      */
     this._imagesLinks = [
-        'img2/Diagram 1_no line.png',
+        'img/Diagram 1_no line.png',
         'img/Correct line_diagram 1.1.png'
     ];
     /*
