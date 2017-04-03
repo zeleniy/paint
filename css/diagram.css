@@ -10,7 +10,7 @@ svg.paint path.user-path {
     pointer-events: none;
 }
 
-svg.paint circle.start-point {
+svg.paint circle.point {
     fill: transparent;
 }
 

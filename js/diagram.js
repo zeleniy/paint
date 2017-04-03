@@ -15,14 +15,19 @@ function Diagram() {
      */
     this._container = undefined;
     /**
+     * Point radius.
+     * @private
+     * @member {Number}
+     */
+    this._pointRadius = 5;
+    /**
      * Image data.
      * @private
      * @member {Object}
      */
     this._imageData = {
         width: 4001,
-        height: 2250,
-        startPoint: [1055, 747]
+        height: 2250
     };
     /**
      * Main image selection.
@@ -30,6 +35,23 @@ function Diagram() {
      * @member {d3.selection[]}
      */
     this._images = [];
+    /**
+     * Points data.
+     * @private
+     * @member {Number[][]}
+     */
+    this._pointsData = [
+        [1055, 747]
+    ];
+    /**
+     * Points.
+     * @private
+     * @member {Object[]}
+     */
+    this._points = {
+        start: [],
+        end: []
+    };
     /**
      * Pointer max x position.
      * @private
@@ -63,11 +85,11 @@ function Diagram() {
      */
     this._dragHandler = d3.drag()
         .on('start', function() {
-            self._dragStartEventHandler();
+            self._dragStartEventHandler(this);
         }).on('drag', function() {
-            self._dragEventHandler();
+            self._dragEventHandler(this);
         }).on('end', function() {
-            self._dragEndEventHandler();
+            self._dragEndEventHandler(this);
         });
     /**
      * Is user finished?
@@ -216,11 +238,13 @@ Diagram.prototype._update = function() {
             .attr('height', this._height);
     }, this);
     /*
-     * Move start point.
+     * Move points.
      */
-    this._start
-        .attr('cx', this._imgXScale(this._imageData.startPoint[0]))
-        .attr('cy', this._imgYScale(this._imageData.startPoint[1]));
+    this._points.forEach(function(point, i) {
+        point
+            .attr('cx', d => this._imgXScale(d[0]))
+            .attr('cy', d => this._imgYScale(d[1]))
+    }, this);
     /*
      * Redraw line.
      */
@@ -249,11 +273,6 @@ Diagram.prototype.renderTo = function(selection) {
     this._svg = this._container.append('svg')
         .attr('class', 'paint');
     /*
-     * Append trace path.
-     */
-    this._path = this._svg.append('path')
-        .attr('class', 'user-path');
-    /*
      * Set up chart dimensions.
      */
     this._resize();
@@ -274,11 +293,19 @@ Diagram.prototype.renderTo = function(selection) {
         this._images.push(image);
     }
     /*
-     * Append start point.
+     * Append trace path.
      */
-    this._start = this._svg.append('circle')
-        .attr('class', 'start-point')
-        .attr('r', 5);
+    this._path = this._svg.append('path')
+        .attr('class', 'user-path');
+    /*
+     * Append start points.
+     */
+    this._points = this._pointsData.map(function(point) {
+        return this._svg.append('circle')
+            .datum(point)
+            .attr('class', 'point start-point')
+            .attr('r', this._pointRadius);
+    }, this);
     /*
      * Append button.
      */
@@ -302,12 +329,13 @@ Diagram.prototype.enablePainting = function() {
     /*
      * Append start point.
      */
-    this._start.call(this._dragHandler);
+    this._points.forEach(this._dragHandler);
     /*
      * Set default mouse cursor and remove drag event handling from start point.
      */
-    this._start.style('cursor', 'pointer');
-
+    this._points.forEach(function(point) {
+        point.style('cursor', 'pointer');
+    })
 };
 
 
@@ -324,7 +352,19 @@ Diagram.prototype.getAnswerImage = function() {
 
 
 /**
- * Show answer.
+ * Show button.
+ * @public
+ */
+Diagram.prototype.showButton = function() {
+    /*
+     * Change button CSS "visibility" property.
+     */
+    this._button.style('visibility', 'visible');
+};
+
+
+/**
+ * Show button.
  * @public
  */
 Diagram.prototype.showAnswer = function() {
@@ -335,9 +375,10 @@ Diagram.prototype.showAnswer = function() {
     /*
      * Set default mouse cursor and remove drag event handling from start point.
      */
-    this._start
-        .style('cursor', 'default')
-        .on(".drag", null);
+    this._points.forEach(function(point) {
+        point.style('cursor', 'default')
+            .on(".drag", null);
+    })
 };
 
 
@@ -361,8 +402,9 @@ Diagram.prototype._setUpScaleDomains = function() {
 /**
  * Drag start event handler.
  * @protected
+ * @param {SVGElement}
  */
-Diagram.prototype._dragStartEventHandler = function() {
+Diagram.prototype._dragStartEventHandler = function(circle) {
     /*
      * Reset flag.
      */
@@ -377,11 +419,15 @@ Diagram.prototype._dragStartEventHandler = function() {
      */
     this._button.style('visibility', 'hidden');
     /*
+     * Get point data.
+     */
+    var data = d3.select(circle).data()[0];
+    /*
      * Reset trace data.
      */
     this._lineData = [{
-        x: this._imgXScale(this._imageData.startPoint[0]),
-        y: this._imgYScale(this._imageData.startPoint[1])
+        x: this._imgXScale(data[0]),
+        y: this._imgYScale(data[1])
     }];
 };
 
@@ -389,12 +435,19 @@ Diagram.prototype._dragStartEventHandler = function() {
 /**
  * Drag event handler.
  * @protected
+ * @param {SVGElement} sourcePoint
  */
-Diagram.prototype._dragEventHandler = function() {
+Diagram.prototype._dragEventHandler = function(sourcePoint) {
+    /*
+     * Show button and quite if target achieved.
+     */
+    if (this._isFinished === true) {
+        return this.showButton();
+    }
     /*
      * Check border "violence". If user crossed border - stop painting.
      */
-    if (this._isBorderCrossed()) {
+    if (this._isTargetAchieved()) {
         return this._isFinished = true;
     }
     /*
@@ -423,11 +476,12 @@ Diagram.prototype._dragEventHandler = function() {
 
 
 /**
- * Is user cross border?
+ * Is target achieved?
+ * Method checks if user achieve final pointer position.
  * @private
  * @returns {Boolean}
  */
-Diagram.prototype._isBorderCrossed = function() {
+Diagram.prototype._isTargetAchieved = function() {
 
     return this._imgXScale.invert(d3.event.x) >= this._endX ||
         this._imgYScale.invert(d3.event.y) >= this._bottomY ||
@@ -442,7 +496,7 @@ Diagram.prototype._isBorderCrossed = function() {
 Diagram.prototype._dragEndEventHandler = function() {
 
     if (this._isFinished === true) {
-        this._button.style('visibility', 'visible');
+        this.showButton();
     }
 };
 
