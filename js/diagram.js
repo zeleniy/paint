@@ -220,7 +220,7 @@ Diagram.prototype._resize = function(dimension) {
 
 /**
  * Update chart.
- * @private
+ * @protected
  */
 Diagram.prototype._update = function() {
     /*
@@ -312,7 +312,7 @@ Diagram.prototype.renderTo = function(selection) {
     this._button = this._container.append('button')
         .attr('class', 'btn btn-primary pull-right')
         .style('visibility', 'hidden')
-        .text('Show answer')
+        .text('Vis svar')
         .on('click', function() {
             self.showAnswer();
         });

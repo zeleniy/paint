@@ -158,6 +158,25 @@ MapDiagram.prototype._getTargetPoint = function(sourcePoint) {
 
 
 /**
+ * Update chart.
+ * @protected
+ */
+MapDiagram.prototype._update = function() {
+    /*
+     * Call parent method.
+     */
+    Diagram.prototype._update.call(this);
+    /*
+     * Update copyright text position.
+     */
+    console.log(this._width)
+    this._copyright.attr('x', this._width - 10)
+        .attr('y', this._height - 10);
+
+};
+
+
+/**
  * Render chart.
  * @public
  * @override
@@ -170,9 +189,15 @@ MapDiagram.prototype.renderTo = function(selection) {
      */
     Diagram.prototype.renderTo.call(this, selection);
     /*
+     * Append copyright.
+     */
+    this._copyright = this._svg.append('text')
+        .attr('class', 'copyright')
+        .text('By Strebe (Own work) [CC BY-SA 3.0], via Wikimedia Commons');
+    /*
      * Populate chart with data.
      */
-    this._update(true);
+    this._update();
     /*
      * Enable painting.
      */
