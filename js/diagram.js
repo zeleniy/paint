@@ -184,7 +184,7 @@ Diagram.getInstance = function(config) {
  */
 Diagram.prototype._preload = function() {
     /*
-     * 
+     *
      */
     this._imagesLinks.forEach(function(url) {
         var image = new Image();
@@ -266,7 +266,8 @@ Diagram.prototype.renderTo = function(selection) {
     /*
      * Select chart container.
      */
-    this._container = d3.select(selection);
+    this._container = d3.select(selection)
+        .attr('class', 'paint-diagram');
     /*
      * Append SVG element.
      */
@@ -307,14 +308,22 @@ Diagram.prototype.renderTo = function(selection) {
             .attr('r', this._pointRadius);
     }, this);
     /*
-     * Append button.
+     * Append buttons.
      */
-    this._button = this._container.append('button')
+    this._showButton = this._container.append('button')
         .attr('class', 'btn btn-primary pull-right')
         .style('visibility', 'hidden')
         .text('Vis svar')
         .on('click', function() {
             self.showAnswer();
+        });
+
+    this._resetButton = this._container.append('button')
+        .attr('class', 'btn btn-primary pull-right')
+        .style('visibility', 'hidden')
+        .text('Reset')
+        .on('click', function() {
+            self.reset();
         });
 
     return this;
@@ -359,7 +368,7 @@ Diagram.prototype.showButton = function() {
     /*
      * Change button CSS "visibility" property.
      */
-    this._button.style('visibility', 'visible');
+    this._showButton.style('visibility', 'visible');
 };
 
 
@@ -379,6 +388,30 @@ Diagram.prototype.showAnswer = function() {
         point.style('cursor', 'default')
             .on(".drag", null);
     })
+};
+
+
+/**
+ * Reset diagram.
+ * @public
+ */
+Diagram.prototype.reset = function() {
+    /*
+     * Reset chart data state.
+     */
+    this._dragStartEventHandler();
+    /*
+     * Redraw line based on empty data.
+     */
+    this._redrawLine();
+    /*
+     * Remove answer background image.
+     */
+    this._images[1].attr('xlink:href', null);
+    /*
+     * Enable painting if was disabled.
+     */
+    this.enablePainting();
 };
 
 
@@ -410,6 +443,14 @@ Diagram.prototype._dragStartEventHandler = function(circle) {
      */
     this._isFinished = false;
     /*
+     *
+     */
+    if (circle) {
+        this._currentStartPoint = circle;
+    } else {
+        circle = this._currentStartPoint;
+    }
+    /*
      * Reset max values.
      */
     this._xMax = 0;
@@ -417,7 +458,8 @@ Diagram.prototype._dragStartEventHandler = function(circle) {
     /*
      * Disable button.
      */
-    this._button.style('visibility', 'hidden');
+    this._showButton.style('visibility', 'hidden');
+    this._resetButton.style('visibility', 'visible');
     /*
      * Get point data.
      */

@@ -1,3 +1,7 @@
+div.paint-diagram button {
+    margin-right: 4px;
+}
+
 svg.paint {
     border: 1px solid black;
 }
