@@ -6,6 +6,24 @@ svg.paint {
     border: 1px solid black;
 }
 
+svg.paint .scroll-axis {
+    fill: #cccccc;
+    stroke: #000;
+    stroke-width: 1;
+}
+
+svg.paint .scroll-axis-tick {
+    stroke: #000;
+    stroke-width: 1;
+}
+
+svg.paint .scroll-axis-handle {
+    fill: #efefef;
+    stroke: #000;
+    stroke-width: 1;
+    cursor: pointer;
+}
+
 svg.paint path.user-path {
     stroke: darkorange;
     stroke-dasharray: 5;
