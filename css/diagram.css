@@ -22,6 +22,7 @@ svg.paint .scroll-axis-handle {
     stroke: #000;
     stroke-width: 1;
     cursor: pointer;
+    pointer-events: none;
 }
 
 svg.paint path.user-path {
