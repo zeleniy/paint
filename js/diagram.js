@@ -349,6 +349,21 @@ Diagram.prototype.enablePainting = function() {
 
 
 /**
+ * Disable paint mode.
+ * @public
+ */
+Diagram.prototype.disablePainting = function() {
+    /*
+     * Set default mouse cursor and remove drag event handling from start point.
+     */
+    this._points.forEach(function(point) {
+        point.style('cursor', 'default')
+            .on('.drag', null);
+    })
+};
+
+
+/**
  * Get answer image URL.
  * @abstarct
  * @public
@@ -384,10 +399,7 @@ Diagram.prototype.showAnswer = function() {
     /*
      * Set default mouse cursor and remove drag event handling from start point.
      */
-    this._points.forEach(function(point) {
-        point.style('cursor', 'default')
-            .on(".drag", null);
-    })
+    this.disablePainting();
 };
 
 

@@ -26,7 +26,7 @@ function AnimatedDiagram() {
      * @member {Integer}
      */
     this._step = 80;
-    this._frameNumber = 0;
+    // this._frameNumber = 0;
     /**
      * Virtual y offset.
      * @private
@@ -87,27 +87,6 @@ AnimatedDiagram.prototype._update = function() {
      * Call parent method.
      */
     Diagram.prototype._update.call(this);
-    // console.log(this._frameNumber)
-    // /*
-    //  * Resize scroll icon.
-    //  */
-    // var offset = 50;
-    // this._scrollBackground
-    //     .attr('x', this._width - 120 - offset)
-    //     .attr('y', this._height - 120 - offset)
-    //     .attr('width', 120)
-    //     .attr('height', 120);
-    // this._scroll
-    //     .attr('x', this._width - 80 - offset)
-    //     .attr('y', this._height - 95 - offset)
-    //     .attr('width', 40)
-    //     .attr('height', 70);
-    // this._scrollPointer
-    //     .attr('cx', this._width - 60 - offset)
-    //     .attr('cy', this._height - 85 - offset);
-    // this._scrollText
-    //     .attr('x', this._width - 60 - offset)
-    //     .attr('y', this._height - 135 - offset);
 
     const tickProtrusion = 5;
     const handleProtrusion = 2;
@@ -128,6 +107,11 @@ AnimatedDiagram.prototype._update = function() {
         .attr('x', this._width - 50 - handleProtrusion)
         .attr('y', this._getHandlePosition())
         .attr('width', this._sliderScale(this._width) + handleProtrusion * 2)
+        .attr('height', handleHeight);
+    this._axisHandleSurface
+        .attr('x', this._width - 50 - handleHeight / 2 + this._sliderScale(this._width) / 2)
+        .attr('y', this._getHandlePosition())
+        .attr('width', handleHeight)
         .attr('height', handleHeight)
         .call(d3.drag()
             .subject(function(d, i, nodes) {
@@ -150,26 +134,18 @@ AnimatedDiagram.prototype._handleDragEventHandler = function() {
 
     this._axisHandle
         .attr('y', Math.max(Math.min(d3.event.y, this._getHandlePosition(0)), this._getHandlePosition(3)));
+    this._axisHandleSurface
+        .attr('y', Math.max(Math.min(d3.event.y, this._getHandlePosition(0)), this._getHandlePosition(3)));
 }
 
 
 AnimatedDiagram.prototype._handleDragEndEventHandler = function() {
 
-    var y = d3.event.y;
+    var y = Math.max(Math.min(d3.event.y, this._getHandlePosition(0)), this._getHandlePosition(3));
 
     var index = d3.range(0, 3).filter(function(d, i) {
-
-            var min = this._getHandlePosition(d + 1);
-            var max = this._getHandlePosition(d);
-
-            if (i == 0) {
-                return y >= min && y < max;
-            } else if (i == 2) {
-                return y >= min && y < max;
-            } else {
-                return y >= min && y <= max;
-            }
-        }, this)[0];
+        return y >= this._getHandlePosition(d + 1) && y <= this._getHandlePosition(d);
+    }, this)[0];
 
     var interval = [this._getHandlePosition(index), this._getHandlePosition(index + 1)];
 
@@ -179,31 +155,67 @@ AnimatedDiagram.prototype._handleDragEndEventHandler = function() {
 
     if (y > middle) {
         this._axisHandle.attr('y', max);
+        this._axisHandleSurface.attr('y', max);
     } else {
         this._axisHandle.attr('y', min);
+        this._axisHandleSurface.attr('y', min);
         index ++;
     }
+    /*
+     * Update global index.
+     */
+    this._index = index;
+    /*
+     * Update background image.
+     */
+    this._images[0].attr('xlink:href', this._imagesLinks[index]);
 
-    this._frameNumber = index;
+    if (index == this._imagesLinks.length - 3) {
+        /*
+         * Gradually show original image.
+         */
+        this._images[2]
+            .style('opacity', 0)
+            .attr('xlink:href', this._imagesLinks[5])
+            .transition()
+            .duration(1500)
+            .style('opacity', 1);
+        // /*
+        //  * Also gradually hide and then remove scroll icon.
+        //  */
+        // this._scrollContainer
+        //     .transition()
+        //     .duration(1500)
+        //     .style('opacity', 0)
+        //     .remove();
+        /*
+         * Enable painting.
+         */
+        this.enablePainting();
+    } else {
+        this._images[2].style('opacity', 0);
+        this.disablePainting();
+    }
 }
 
 
 /**
  * Get handle Y position based on animation frame number.
  * @public
+ * @param {Integer} [index]
  * @returns {Number}
  */
-AnimatedDiagram.prototype._getHandlePosition = function(frameNumber) {
+AnimatedDiagram.prototype._getHandlePosition = function(index) {
 
-    if (frameNumber == undefined) {
-        frameNumber = this._frameNumber;
+    if (index == undefined) {
+        index = this._index;
     }
 
     const axisHeight = this._height * 0.85;
     const handleHeight = axisHeight * 0.08;
     const top = (this._height - axisHeight) / 2 - handleHeight / 2;
 
-    return top + (axisHeight / 3 * (3 - frameNumber));
+    return top + (axisHeight / 3 * (3 - index));
 }
 
 
@@ -239,96 +251,10 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
         .append('rect')
         .attr('class', 'scroll-axis-handle')
         .attr('rx', 2);
-
-
-
-    // this._scrollBackground = this._scrollContainer.append('rect')
-    //     .attr('class', 'scroll-background')
-    //     .attr('x', this._width - 150 - 10)
-    //     .attr('y', this._height - 150 - 10)
-    //     .attr('width', 150)
-    //     .attr('height', 150)
-    //     .style('fill', '#3498db');
-    // this._scroll = this._scrollContainer.append('rect')
-    //     .attr('class', 'scroll')
-    //     .attr('x', this._width - 95 - 10)
-    //     .attr('y', this._height - 110 - 10)
-    //     .attr('width', 40)
-    //     .attr('height', 70)
-    //     .attr('ry', 20)
-    //     .style('fill', '#3498db')
-    //     .style('stroke', '#fff')
-    //     .style('stroke-width', 1);
-    // this._scrollPointer = this._scrollContainer.append('circle')
-    //     .attr('class', 'scroll-pointer')
-    //     .attr('cx', this._width - 75 - 10)
-    //     .attr('cy', this._height - 100 - 10)
-    //     .attr('r', 5)
-    //     .style('fill', '#fff');
-    // this._scrollText = this._scrollContainer.append('text')
-    //     .attr('class', 'scroll-text')
-    //     .text('"SCROLL" FOR Å BØYE TIDROM');
-    // /*
-    //  * Stash reference to this object.
-    //  */
-    // var self = this;
-    // /*
-    //  * Set scroll event handler.
-    //  */
-    // this._svg.on('wheel', function() {
-    //     /*
-    //      * Prevent mousewheel event default behaviour. Necessary because of Safari bug.
-    //      * See for details:
-    //      * - https://github.com/jquery/jquery-mousewheel
-    //      * - https://github.com/jquery/jquery-mousewheel/issues/156#issuecomment-185433754
-    //      * - https://bugs.webkit.org/show_bug.cgi?id=149526
-    //      */
-    //     d3.event.preventDefault();
-    //     /*
-    //      * Calculate y offset. It should be restricted between 0 and 'step * size(this._imagesLinks)'
-    //      */
-    //     self._yOffset = Math.min(self._step * (self._imagesLinks.length - 3), Math.max(0, self._yOffset + d3.event.deltaY));
-    //     /*
-    //      * Calculate images array index.
-    //      */
-    //     var index = Math.max(0, Math.min(self._imagesLinks.length - 3, Math.round((self._yOffset / self._step))));
-    //     /*
-    //      * Check local and global indexes equality.
-    //      */
-    //     if (self._index < index) {
-    //         /*
-    //          * Update global index.
-    //          */
-    //         self._index = index;
-    //         /*
-    //          * Update background image.
-    //          */
-    //         self._images[0].attr('xlink:href', self._imagesLinks[index]);
-    //         if (index == self._imagesLinks.length - 3) {
-    //             /*
-    //              * Gradually show original image.
-    //              */
-    //             self._images[2]
-    //                 .style('opacity', 0)
-    //                 .attr('xlink:href', self._imagesLinks[5])
-    //                 .transition()
-    //                 .duration(1500)
-    //                 .style('opacity', 1);
-    //             /*
-    //              * Also gradually hide and then remove scroll icon.
-    //              */
-    //             self._scrollContainer
-    //                 .transition()
-    //                 .duration(1500)
-    //                 .style('opacity', 0)
-    //                 .remove();
-    //             /*
-    //              * Enable painting.
-    //              */
-    //             self.enablePainting();
-    //         }
-    //     }
-    // });
+    this._axisHandleSurface = this._scrollContainer
+        .append('rect')
+        .attr('class', 'scroll-axis-handle-surface')
+        .style('opacity', 0.5);
     /*
      * Populate chart with data.
      */
