@@ -124,7 +124,8 @@ AnimatedDiagram.prototype._update = function() {
                     x: handleRect.attr('x'),
                     y: handleRect.attr('y')
                 };
-            }).on('drag', function() {
+            })
+            .on('drag', function() {
                this._handleDragEventHandler()
             }.bind(this))
             .on('end', function() {
@@ -138,8 +139,45 @@ AnimatedDiagram.prototype._handleDragEventHandler = function() {
 
     const y = Math.max(Math.min(d3.event.y, this._getHandlePosition(0)), this._getHandlePosition(3));
 
+    if (y > this._y) {
+        return;
+    }
+
+    this._y = y;
+
+    const axisHeight = this._height * 0.85;
+    const handleHeight = axisHeight * 0.08;
+    const surfaceHeight = handleHeight * 1.5;
+
     this._axisHandle.attr('y', y);
-    this._axisHandleSurface.attr('y', y);
+    this._axisHandleSurface.attr('y', y - (surfaceHeight - handleHeight) / 2);
+
+    var index = d3.range(0, 3).filter(function(d, i) {
+        return y >= this._getHandlePosition(d + 1) && y <= this._getHandlePosition(d);
+    }, this)[0];
+
+    var interval = [this._getHandlePosition(index), this._getHandlePosition(index + 1)];
+
+    var min = interval[1];
+    var max = interval[0];
+    var middle = min + (max - min) / 2;
+
+    if (y > min) {
+        // this._axisHandle.attr('y', max);
+        // this._axisHandleSurface.attr('y', max - (surfaceHeight - handleHeight) / 2);
+    } else {
+        // this._axisHandle.attr('y', min);
+        // this._axisHandleSurface.attr('y', min - (surfaceHeight - handleHeight) / 2);
+        index ++;
+    }
+    /*
+     * Update global index.
+     */
+    this._index = index;
+    /*
+     * Update background image.
+     */
+    this._images[0].attr('xlink:href', this._imagesLinks[index]);
 }
 
 
@@ -150,6 +188,10 @@ AnimatedDiagram.prototype._handleDragEndEventHandler = function() {
     var index = d3.range(0, 3).filter(function(d, i) {
         return y >= this._getHandlePosition(d + 1) && y <= this._getHandlePosition(d);
     }, this)[0];
+
+    if (index <= this._index) {
+        index = this._index;
+    }
 
     var interval = [this._getHandlePosition(index), this._getHandlePosition(index + 1)];
 
@@ -188,14 +230,6 @@ AnimatedDiagram.prototype._handleDragEndEventHandler = function() {
             .transition()
             .duration(1500)
             .style('opacity', 1);
-        // /*
-        //  * Also gradually hide and then remove scroll icon.
-        //  */
-        // this._scrollContainer
-        //     .transition()
-        //     .duration(1500)
-        //     .style('opacity', 0)
-        //     .remove();
         /*
          * Enable painting.
          */
