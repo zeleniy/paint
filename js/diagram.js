@@ -19,7 +19,7 @@ function Diagram() {
      * @private
      * @member {Number}
      */
-    this._pointRadius = 5;
+    this._pointRadius = 10;
     /**
      * Image data.
      * @private
