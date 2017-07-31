@@ -3,9 +3,10 @@
  * @public
  * @class
  * @param {String[]} imagesLinks - list of images URL's.
- * @param {Number[][]} points - list of points coordinates.
+ * @param {Number[]} sourcePoint - source point.
+ * @param {Number[]} targetPoint - target point.
  */
-function MapDiagram(imagesLinks, points) {
+function MapDiagram(imagesLinks, sourcePoint, targetPoint) {
     /**
      * Images urls.
      * @private
@@ -30,7 +31,13 @@ function MapDiagram(imagesLinks, points) {
      * @private
      * @member {Number[][]}
      */
-    this._pointsData = points;
+    this._pointsData = [sourcePoint];
+    /**
+     * Target point.
+     * @private
+     * @member {Number[]}
+     */
+    this._targetPoint = targetPoint;
     /*
      * Preload images.
      */
@@ -49,11 +56,12 @@ MapDiagram.prototype = Object.create(Diagram.prototype);
  * @static
  * @returns {MapDiagram}
  * @param {String[]} imagesLinks - list of images URL's.
- * @param {Integer[][]} points - list of points coordinates.
+ * @param {Number[]} sourcePoint - source point.
+ * @param {Number[]} targetPoint - target point.
  */
-MapDiagram.getInstance = function(imagesLinks, points) {
+MapDiagram.getInstance = function(imagesLinks, sourcePoint, targetPoint) {
 
-    return new MapDiagram(imagesLinks, points);
+    return new MapDiagram(imagesLinks, sourcePoint, targetPoint);
 };
 
 
@@ -84,7 +92,7 @@ MapDiagram.prototype._dragEventHandler = function(sourcePoint) {
     /*
      * Check target achieved.
      */
-    if (this._isTargetAchieved(sourcePoint)) {
+    if (this._isTargetAchieved()) {
         this._isFinished = true;
     }
     /*
@@ -102,13 +110,58 @@ MapDiagram.prototype._dragEventHandler = function(sourcePoint) {
 
 
 /**
+ * Drag start event handler.
+ * @protected
+ * @override
+ * @param {SVGElement}
+ */
+MapDiagram.prototype._dragStartEventHandler = function(circle) {
+
+    Diagram.prototype._dragStartEventHandler.call(this, circle);
+    /*
+     * Add blinking class to points.
+     */
+    this._points.forEach(p => p.classed('map-point', false));
+};
+
+
+/**
+ * Drag start event handler.
+ * @protected
+ * @override
+ */
+MapDiagram.prototype._dragEndEventHandler = function() {
+
+    Diagram.prototype._dragEndEventHandler.call(this);
+    /*
+     * Add blinking class to points.
+     */
+    if (! this._isTargetAchieved()) {
+        this._points.forEach(p => p.classed('map-point', true));
+    }
+};
+
+
+/**
+ * Reset diagram.
+ * @public
+ * @override
+ */
+MapDiagram.prototype.reset = function() {
+
+    Diagram.prototype.reset.call(this);
+
+    this._points.forEach(p => p.classed('map-point', true));
+}
+
+
+/**
  * Is target achieved?
  * Method checks if user achieve final pointer position.
  * @private
- * @param {SVGElement} sourcePoint
  * @returns {Boolean}
  */
-MapDiagram.prototype._isTargetAchieved = function(sourcePoint) {
+MapDiagram.prototype._isTargetAchieved = function() {
     /*
      * Get scailed pointer radius.
      */
@@ -119,41 +172,15 @@ MapDiagram.prototype._isTargetAchieved = function(sourcePoint) {
     var pointerX = this._imgXScale.invert(d3.event.x);
     var pointerY = this._imgYScale.invert(d3.event.y);
     /*
-     * Get opposite/target point data/coordinates.
-     */
-    var targetData = this._getTargetPoint(sourcePoint).data()[0];
-    /*
      * Extract coordinates in separate variables.
      */
-    var targetX = targetData[0];
-    var targetY = targetData[1];
+    var targetX = this._targetPoint[0];
+    var targetY = this._targetPoint[1];
     /*
      * Check mouse pointer within target point.
      */
     return pointerX < targetX + radius && pointerX > targetX - radius &&
         pointerY < targetY + radius && pointerY > targetY - radius;
-};
-
-
-/**
- * Get target point.
- * Because user can start to draw from any point we should find opposite one.
- * @param {SVGElement} sourcePoint
- * @returns {d3.selection}
- */
-MapDiagram.prototype._getTargetPoint = function(sourcePoint) {
-    /*
-     * Get source point data/coordinates.
-     */
-    sourcePointData = d3.select(sourcePoint).data();
-    /*
-     * Compare source point coordinates with first point from the list.
-     */
-    if (sourcePointData[0][0] == this._pointsData[0][0] && sourcePointData[0][1] == this._pointsData[0][1]) {
-        return this._points[1];
-    } else {
-        return this._points[0];
-    }
 };
 
 
@@ -169,10 +196,8 @@ MapDiagram.prototype._update = function() {
     /*
      * Update copyright text position.
      */
-    console.log(this._width)
     this._copyright.attr('x', this._width - 10)
         .attr('y', this._height - 10);
-
 };
 
 
@@ -188,6 +213,10 @@ MapDiagram.prototype.renderTo = function(selection) {
      * Call parent method.
      */
     Diagram.prototype.renderTo.call(this, selection);
+    /*
+     * Add blinking class to points.
+     */
+    this._points.forEach(p => p.classed('map-point', true));
     /*
      * Append copyright.
      */
