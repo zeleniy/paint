@@ -37,8 +37,9 @@ svg.paint circle.point {
     fill: transparent;
 }
 
-svg.paint circle.map-point {
+svg.paint circle.blink-point {
     fill: red;
+    pointer-events: none;
     animation-iteration-count: infinite;
     animation-name: blink;
     animation-duration: 2s;

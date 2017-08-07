@@ -36,22 +36,17 @@ function Diagram() {
      */
     this._images = [];
     /**
+     * Start point.
+     * @private
+     * @member {d3.selection}
+     */
+    this._startPoint = d3.select();
+    /**
      * Points data.
      * @private
-     * @member {Number[][]}
+     * @member {Number[]}
      */
-    this._pointsData = [
-        [1055, 747]
-    ];
-    /**
-     * Points.
-     * @private
-     * @member {Object[]}
-     */
-    this._points = {
-        start: [],
-        end: []
-    };
+    this._startPointData = [1055, 747];
     /**
      * Pointer max x position.
      * @private
@@ -238,14 +233,6 @@ Diagram.prototype._update = function() {
             .attr('height', this._height);
     }, this);
     /*
-     * Move points.
-     */
-    this._points.forEach(function(point, i) {
-        point
-            .attr('cx', d => this._imgXScale(d[0]))
-            .attr('cy', d => this._imgYScale(d[1]))
-    }, this);
-    /*
      * Redraw line.
      */
     this._redrawLine();
@@ -301,12 +288,11 @@ Diagram.prototype.renderTo = function(selection) {
     /*
      * Append start points.
      */
-    this._points = this._pointsData.map(function(point) {
-        return this._svg.append('circle')
-            .datum(point)
-            .attr('class', 'point start-point')
-            .attr('r', this._pointRadius);
-    }, this);
+    this._startPoint = this._svg
+        .append('circle')
+        .datum(this._startPointData)
+        .attr('class', 'point start-point')
+        .attr('r', this._pointRadius);
     /*
      * Append buttons.
      */
@@ -338,13 +324,11 @@ Diagram.prototype.enablePainting = function() {
     /*
      * Append start point.
      */
-    this._points.forEach(this._dragHandler);
+    this._startPoint.call(this._dragHandler);
     /*
      * Set default mouse cursor and remove drag event handling from start point.
      */
-    this._points.forEach(function(point) {
-        point.style('cursor', 'pointer');
-    })
+    this._startPoint.style('cursor', 'pointer');
 };
 
 
@@ -356,10 +340,8 @@ Diagram.prototype.disablePainting = function() {
     /*
      * Set default mouse cursor and remove drag event handling from start point.
      */
-    this._points.forEach(function(point) {
-        point.style('cursor', 'default')
-            .on('.drag', null);
-    })
+    this._startPoint.style('cursor', 'default')
+        .on('.drag', null);
 };
 
 
@@ -409,9 +391,21 @@ Diagram.prototype.showAnswer = function() {
  */
 Diagram.prototype.reset = function() {
     /*
-     * Reset chart data state.
+     * Reset max values.
      */
-    this._dragStartEventHandler();
+    this._xMax = 0;
+    this._yMax = 0;
+    /*
+     * Disable button.
+     */
+    this._showButton.style('visibility', 'hidden');
+    /*
+     * Reset trace data.
+     */
+    this._lineData = [{
+        x: this._imgXScale(this._startPointData[0]),
+        y: this._imgYScale(this._startPointData[1])
+    }];
     /*
      * Redraw line based on empty data.
      */
@@ -447,42 +441,16 @@ Diagram.prototype._setUpScaleDomains = function() {
 /**
  * Drag start event handler.
  * @protected
- * @param {SVGElement}
  */
-Diagram.prototype._dragStartEventHandler = function(circle) {
+Diagram.prototype._dragStartEventHandler = function() {
     /*
      * Reset flag.
      */
     this._isFinished = false;
     /*
-     *
+     * Show reset button.
      */
-    if (circle) {
-        this._currentStartPoint = circle;
-    } else {
-        circle = this._currentStartPoint;
-    }
-    /*
-     * Reset max values.
-     */
-    this._xMax = 0;
-    this._yMax = 0;
-    /*
-     * Disable button.
-     */
-    this._showButton.style('visibility', 'hidden');
     this._resetButton.style('visibility', 'visible');
-    /*
-     * Get point data.
-     */
-    var data = d3.select(circle).data()[0];
-    /*
-     * Reset trace data.
-     */
-    this._lineData = [{
-        x: this._imgXScale(data[0]),
-        y: this._imgYScale(data[1])
-    }];
 };
 
 
@@ -562,14 +530,26 @@ Diagram.prototype._dragEndEventHandler = function() {
 Diagram.prototype._redrawLine = function() {
 
     this._path.attr('d', this._lineGenerator(this._lineData));
+    /*
+     * Get cursor position and move start point.
+     */
+    var position = this._lineData[this._lineData.length - 1] || {
+        x: this._imgXScale(this._startPointData[0]),
+        y: this._imgXScale(this._startPointData[1])
+    };
+
+    this._startPoint
+        .datum([position.x, position.y])
+        .attr('cx', d => this._svgXScale(d[0]))
+        .attr('cy', d => this._svgYScale(d[1]));
 };
 
 
 /**
  * Generate chart unique id.
  * @see http://stackoverflow.com/a/2117523/1191125
- * @pivate
- * @param {String} pattern
+ * @private
+ * @param {String} [pattern]
  * @returns {String}
  */
 Diagram.prototype._getUniqueId = function(pattern) {

@@ -31,7 +31,7 @@ function MapDiagram(imagesLinks, sourcePoint, targetPoint) {
      * @private
      * @member {Number[][]}
      */
-    this._pointsData = [sourcePoint];
+    this._startPointData = sourcePoint;
     /**
      * Target point.
      * @private
@@ -43,6 +43,7 @@ function MapDiagram(imagesLinks, sourcePoint, targetPoint) {
      */
     this._preload();
 }
+
 
 /*
  * Inherit Diagram class.
@@ -113,15 +114,14 @@ MapDiagram.prototype._dragEventHandler = function(sourcePoint) {
  * Drag start event handler.
  * @protected
  * @override
- * @param {SVGElement}
  */
-MapDiagram.prototype._dragStartEventHandler = function(circle) {
+MapDiagram.prototype._dragStartEventHandler = function() {
 
-    Diagram.prototype._dragStartEventHandler.call(this, circle);
+    Diagram.prototype._dragStartEventHandler.call(this);
     /*
      * Add blinking class to points.
      */
-    this._points.forEach(p => p.classed('map-point', false));
+    this._blinkPoint.classed('blink-point', false);
 };
 
 
@@ -137,7 +137,7 @@ MapDiagram.prototype._dragEndEventHandler = function() {
      * Add blinking class to points.
      */
     if (! this._isTargetAchieved()) {
-        this._points.forEach(p => p.classed('map-point', true));
+        this._blinkPoint.classed('blink-point', true);
     }
 };
 
@@ -151,7 +151,7 @@ MapDiagram.prototype.reset = function() {
 
     Diagram.prototype.reset.call(this);
 
-    this._points.forEach(p => p.classed('map-point', true));
+    this._blinkPoint.classed('blink-point', true);
 }
 
 
@@ -198,6 +198,10 @@ MapDiagram.prototype._update = function() {
      */
     this._copyright.attr('x', this._width - 10)
         .attr('y', this._height - 10);
+
+    this._blinkPoint
+        .attr('cx', d => this._imgXScale(d[0]))
+        .attr('cy', d => this._imgYScale(d[1]));
 };
 
 
@@ -214,9 +218,13 @@ MapDiagram.prototype.renderTo = function(selection) {
      */
     Diagram.prototype.renderTo.call(this, selection);
     /*
-     * Add blinking class to points.
+     * Append blink point.
      */
-    this._points.forEach(p => p.classed('map-point', true));
+    this._blinkPoint = this._svg
+        .append('circle')
+        .datum(this._startPointData)
+        .attr('class', 'point blink-point')
+        .attr('r', this._pointRadius);
     /*
      * Append copyright.
      */
