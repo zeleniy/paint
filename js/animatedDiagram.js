@@ -26,7 +26,7 @@ function AnimatedDiagram() {
      * @member {Integer}
      */
     this._step = 80;
-    // this._frameNumber = 0;
+    this._axisHeightCoef = 0.8;
     /**
      * Virtual y offset.
      * @private
@@ -39,13 +39,20 @@ function AnimatedDiagram() {
      * @member {Integer}
      */
     this._requiredImagesAmount = 3;
-    /*
+    /**
      *
      */
     this._sliderScale = d3.scaleLinear()
         .domain([200, 800])
         .range([2, 8])
         .clamp(true);
+    /**
+     *
+     */
+     this._fontScale = d3.scaleLinear()
+         .domain([200, 800])
+         .range([8, 14])
+         .clamp(true);
     /*
      * Preload images.
      */
@@ -89,18 +96,20 @@ AnimatedDiagram.prototype._update = function() {
     Diagram.prototype._update.call(this);
 
     const tickProtrusion = 5;
-    const axisHeight = this._height * 0.85;
+    const axisHeight = this._height * this._axisHeightCoef;
     const handleHeight = axisHeight * 0.08;
+    const axisWidth = this._sliderScale(this._width);
+    const axisOffset = this._scrollText.node().getBoundingClientRect().width / 2 + 10 + axisWidth / 2;
 
     this._axis
-        .attr('x', this._width - 50)
+        .attr('x', this._width - axisOffset)
         .attr('y', (this._height - axisHeight) / 2)
-        .attr('width', this._sliderScale(this._width))
+        .attr('width', axisWidth)
         .attr('height', axisHeight);
     this._axisTicks
-        .attr('x1', this._width - 50 - tickProtrusion)
+        .attr('x1', this._width - axisOffset - tickProtrusion)
         .attr('y1', (d, i) => ((this._height - axisHeight) / 2) + axisHeight / 3 * i)
-        .attr('x2', this._width - 50 + this._sliderScale(this._width) + tickProtrusion)
+        .attr('x2', this._width - axisOffset + axisWidth + tickProtrusion)
         .attr('y2', (d, i) => ((this._height - axisHeight) / 2) + axisHeight / 3 * i);
 
     const handleProtrusion = 2;
@@ -108,12 +117,12 @@ AnimatedDiagram.prototype._update = function() {
     const y = this._getHandlePosition();
 
     this._axisHandle
-        .attr('x', this._width - 50 - handleProtrusion)
+        .attr('x', this._width - axisOffset - handleProtrusion)
         .attr('y', y)
-        .attr('width', this._sliderScale(this._width) + handleProtrusion * 2)
+        .attr('width', axisWidth + handleProtrusion * 2)
         .attr('height', handleHeight);
     this._axisHandleSurface
-        .attr('x', this._width - 50 - surfaceHeight / 2 + this._sliderScale(this._width) / 2)
+        .attr('x', this._width - axisOffset - surfaceHeight / 2 + axisWidth / 2)
         .attr('y', y - (surfaceHeight - handleHeight) / 2)
         .attr('width', surfaceHeight)
         .attr('height', surfaceHeight)
@@ -132,6 +141,11 @@ AnimatedDiagram.prototype._update = function() {
                this._handleDragEndEventHandler()
             }.bind(this))
         );
+
+        this._scrollText
+            .attr('x', this._width - axisOffset)
+            .attr('y', this._height - axisWidth)
+            .style('font-size', this._fontScale(this._width) + 'px');
 };
 
 
@@ -145,7 +159,7 @@ AnimatedDiagram.prototype._handleDragEventHandler = function() {
 
     this._y = y;
 
-    const axisHeight = this._height * 0.85;
+    const axisHeight = this._height * this._axisHeightCoef;
     const handleHeight = axisHeight * 0.08;
     const surfaceHeight = handleHeight * 1.5;
 
@@ -199,7 +213,7 @@ AnimatedDiagram.prototype._handleDragEndEventHandler = function() {
     var max = interval[0];
     var middle = min + (max - min) / 2;
 
-    const axisHeight = this._height * 0.85;
+    const axisHeight = this._height * this._axisHeightCoef;
     const handleHeight = axisHeight * 0.08;
     const surfaceHeight = handleHeight * 1.5;
 
@@ -253,7 +267,7 @@ AnimatedDiagram.prototype._getHandlePosition = function(index) {
         index = this._index;
     }
 
-    const axisHeight = this._height * 0.85;
+    const axisHeight = this._height * this._axisHeightCoef;
     const handleHeight = axisHeight * 0.08;
     const top = (this._height - axisHeight) / 2 - handleHeight / 2;
 
@@ -297,8 +311,12 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
         .append('rect')
         .attr('class', 'scroll-axis-handle')
         .attr('rx', 2);
+    this._scrollText = this._scrollContainer
+        .append('text')
+        .attr('class', 'scroll-text')
+        .text('slide for å bøye tidrom');
     /*
      * Populate chart with data.
      */
-    this._update(true);
+    this._update();
 };
