@@ -199,6 +199,10 @@ AnimatedDiagram.prototype._handleDragEndEventHandler = function() {
 
     var y = Math.max(Math.min(d3.event.y, this._getHandlePosition(0)), this._getHandlePosition(3));
 
+    if (y < this._y) {
+        y = this._y;
+    }
+
     var index = d3.range(0, 3).filter(function(d, i) {
         return y >= this._getHandlePosition(d + 1) && y <= this._getHandlePosition(d);
     }, this)[0];
