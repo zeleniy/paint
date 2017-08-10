@@ -71,8 +71,8 @@ function Diagram() {
      * @member {Function}
      */
     this._lineGenerator = d3.line()
-        .x(d => this._svgXScale(d.x))
-        .y(d => this._svgYScale(d.y));
+        .x(d => this._getAbsoluteX(d.x))
+        .y(d => this._getAbsoluteY(d.y));
     /**
      * Drag event handler.
      * @private
@@ -99,18 +99,6 @@ function Diagram() {
      * @member {Integer}
      */
     this._requiredImagesAmount = 2;
-    /**
-     * SVG level x scale function.
-     * @private
-     * @member {Function}
-     */
-    this._svgXScale = d3.scaleLinear();
-    /**
-     * SVG level y scale function.
-     * @private
-     * @member {Function}
-     */
-    this._svgYScale = d3.scaleLinear();
     /**
      * Image level x scale function.
      * @private
@@ -208,8 +196,6 @@ Diagram.prototype._resize = function(dimension) {
      */
     this._imgXScale.range([0, this._width]);
     this._imgYScale.range([0, this._height]);
-    this._svgXScale.range([0, this._width]);
-    this._svgYScale.range([0, this._height])
 };
 
 
@@ -415,8 +401,8 @@ Diagram.prototype.reset = function() {
      * Reset trace data.
      */
     this._lineData = [{
-        x: this._imgXScale(this._startPointData[0]),
-        y: this._imgYScale(this._startPointData[1])
+        x: this._getRelativeX(this._imgXScale(this._startPointData[0])),
+        y: this._getRelativeY(this._imgYScale(this._startPointData[1]))
     }];
     /*
      * Redraw line based on empty data.
@@ -442,11 +428,6 @@ Diagram.prototype._setUpScaleDomains = function() {
      */
     this._imgXScale.domain([0, this._imageData.width]);
     this._imgYScale.domain([0, this._imageData.height]);
-    /*
-     * Configure svg scale functions.
-     */
-    this._svgXScale.domain([0, this._width]);
-    this._svgYScale.domain([0, this._height])
 };
 
 
@@ -491,20 +472,20 @@ Diagram.prototype._dragEventHandler = function(sourcePoint) {
     /*
      * Update only y coordinate if user try to draw in opposite direction.
      */
-    if (this._xMax >= d3.event.x && this._lineData.length) {
-        this._lineData[this._lineData.length - 1].y = d3.event.y;
+    if (this._xMax >= this._getRelativeX(d3.event.x) && this._lineData.length) {
+        this._lineData[this._lineData.length - 1].y = this._getRelativeY(d3.event.y);
         return this._redrawLine();
     }
     /*
      * Update rightmost position where user was.
      */
-    this._xMax = d3.event.x;
+    this._xMax = this._getRelativeX(d3.event.x);
     /*
      * Add new point to the line data set.
      */
     this._lineData.push({
-        x : d3.event.x,
-        y : d3.event.y
+        x : this._getRelativeX(d3.event.x),
+        y : this._getRelativeY(d3.event.y)
     });
     /*
      * Redraw line.
@@ -550,19 +531,62 @@ Diagram.prototype._redrawLine = function() {
      * Get cursor position and move start point.
      */
     var position = this._lineData[this._lineData.length - 1] || {
-        x: this._imgXScale(this._startPointData[0]),
-        y: this._imgXScale(this._startPointData[1])
+        x: this._getRelativeX(this._imgXScale(this._startPointData[0])),
+        y: this._getRelativeY(this._imgYScale(this._startPointData[1]))
     };
 
     this._startPoint
         .datum([position.x, position.y])
-        .attr('cx', d => this._svgXScale(d[0]))
-        .attr('cy', d => this._svgYScale(d[1]));
+        .attr('cx', d => this._getAbsoluteX(d[0]))
+        .attr('cy', d => this._getAbsoluteY(d[1]));
 
     this._blinkPoint
         .attr('cx', d => this._imgXScale(d[0]))
         .attr('cy', d => this._imgYScale(d[1]));
+};
 
+
+/**
+ * Convert pointer (absolute) x coordinate to relative.
+ * @param {Number} x
+ * @returns {Number}
+ */
+Diagram.prototype._getRelativeX = function(x) {
+
+    return x / this._width;
+};
+
+
+/**
+ * Convert pointer (absolute) y coordinate to relative.
+ * @param {Number} y
+ * @returns {Number}
+ */
+Diagram.prototype._getRelativeY = function(y) {
+
+    return y / this._height;
+};
+
+
+/**
+ * Convert relative x coordinate to absolute.
+ * @param {Number} x
+ * @returns {Number}
+ */
+Diagram.prototype._getAbsoluteX = function(x) {
+
+    return x * this._width;
+};
+
+
+/**
+ * Convert relative y coordinate to absolute.
+ * @param {Number} y
+ * @returns {Number}
+ */
+Diagram.prototype._getAbsoluteY = function(y) {
+
+    return y * this._height;
 };
 
 

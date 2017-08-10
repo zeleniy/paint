@@ -100,8 +100,8 @@ MapDiagram.prototype._dragEventHandler = function(sourcePoint) {
      * Add new point to the line data set.
      */
     this._lineData.push({
-        x : d3.event.x,
-        y : d3.event.y
+        x : this._getRelativeX(d3.event.x),
+        y : this._getRelativeY(d3.event.y)
     });
     /*
      * Redraw line.
