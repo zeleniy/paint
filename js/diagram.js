@@ -294,9 +294,17 @@ Diagram.prototype.renderTo = function(selection) {
         .attr('class', 'point start-point')
         .attr('r', this._pointRadius);
     /*
+     * Append blink point.
+     */
+    this._blinkPoint = this._svg
+        .append('circle')
+        .datum(this._startPointData)
+        .attr('class', 'point blink-point')
+        .attr('r', this._pointRadius);
+    /*
      * Append buttons.
      */
-    this._showButton = this._container.append('button')
+    this._showAnswerButton = this._container.append('button')
         .attr('class', 'btn btn-primary pull-right')
         .style('visibility', 'hidden')
         .text('Vis svar')
@@ -329,6 +337,10 @@ Diagram.prototype.enablePainting = function() {
      * Set default mouse cursor and remove drag event handling from start point.
      */
     this._startPoint.style('cursor', 'pointer');
+    /*
+     * Enable blinking.
+     */
+    this._blinkPoint.classed('blink-point', true);
 };
 
 
@@ -361,11 +373,11 @@ Diagram.prototype.getAnswerImage = function() {
  * Show button.
  * @public
  */
-Diagram.prototype.showButton = function() {
+Diagram.prototype.showAnswerButton = function() {
     /*
      * Change button CSS "visibility" property.
      */
-    this._showButton.style('visibility', 'visible');
+    this._showAnswerButton.style('visibility', 'visible');
 };
 
 
@@ -398,7 +410,7 @@ Diagram.prototype.reset = function() {
     /*
      * Disable button.
      */
-    this._showButton.style('visibility', 'hidden');
+    this._showAnswerButton.style('visibility', 'hidden');
     /*
      * Reset trace data.
      */
@@ -451,6 +463,10 @@ Diagram.prototype._dragStartEventHandler = function() {
      * Show reset button.
      */
     this._resetButton.style('visibility', 'visible');
+    /*
+     * Disable blinking.
+     */
+    this._blinkPoint.classed('blink-point', false);
 };
 
 
@@ -464,7 +480,7 @@ Diagram.prototype._dragEventHandler = function(sourcePoint) {
      * Show button and quite if target achieved.
      */
     if (this._isFinished === true) {
-        return this.showButton();
+        return this.showAnswerButton();
     }
     /*
      * Check border "violence". If user crossed border - stop painting.
@@ -518,7 +534,7 @@ Diagram.prototype._isTargetAchieved = function() {
 Diagram.prototype._dragEndEventHandler = function() {
 
     if (this._isFinished === true) {
-        this.showButton();
+        this.showAnswerButton();
     }
 };
 
@@ -542,6 +558,11 @@ Diagram.prototype._redrawLine = function() {
         .datum([position.x, position.y])
         .attr('cx', d => this._svgXScale(d[0]))
         .attr('cy', d => this._svgYScale(d[1]));
+
+    this._blinkPoint
+        .attr('cx', d => this._imgXScale(d[0]))
+        .attr('cy', d => this._imgYScale(d[1]));
+
 };
 
 

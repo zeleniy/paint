@@ -88,7 +88,7 @@ MapDiagram.prototype._dragEventHandler = function(sourcePoint) {
      * Show button and quite if target achieved.
      */
     if (this._isFinished === true) {
-        return this.showButton();
+        return this.showAnswerButton();
     }
     /*
      * Check target achieved.
@@ -108,51 +108,6 @@ MapDiagram.prototype._dragEventHandler = function(sourcePoint) {
      */
     this._redrawLine();
 };
-
-
-/**
- * Drag start event handler.
- * @protected
- * @override
- */
-MapDiagram.prototype._dragStartEventHandler = function() {
-
-    Diagram.prototype._dragStartEventHandler.call(this);
-    /*
-     * Add blinking class to points.
-     */
-    this._blinkPoint.classed('blink-point', false);
-};
-
-
-/**
- * Drag start event handler.
- * @protected
- * @override
- */
-MapDiagram.prototype._dragEndEventHandler = function() {
-
-    Diagram.prototype._dragEndEventHandler.call(this);
-    /*
-     * Add blinking class to points.
-     */
-    if (! this._isTargetAchieved()) {
-        this._blinkPoint.classed('blink-point', true);
-    }
-};
-
-
-/**
- * Reset diagram.
- * @public
- * @override
- */
-MapDiagram.prototype.reset = function() {
-
-    Diagram.prototype.reset.call(this);
-
-    this._blinkPoint.classed('blink-point', true);
-}
 
 
 /**
@@ -198,10 +153,6 @@ MapDiagram.prototype._update = function() {
      */
     this._copyright.attr('x', this._width - 10)
         .attr('y', this._height - 10);
-
-    this._blinkPoint
-        .attr('cx', d => this._imgXScale(d[0]))
-        .attr('cy', d => this._imgYScale(d[1]));
 };
 
 
@@ -217,14 +168,6 @@ MapDiagram.prototype.renderTo = function(selection) {
      * Call parent method.
      */
     Diagram.prototype.renderTo.call(this, selection);
-    /*
-     * Append blink point.
-     */
-    this._blinkPoint = this._svg
-        .append('circle')
-        .datum(this._startPointData)
-        .attr('class', 'point blink-point')
-        .attr('r', this._pointRadius);
     /*
      * Append copyright.
      */
