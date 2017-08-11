@@ -34,7 +34,8 @@ svg.paint path.user-path {
 }
 
 svg.paint circle.point {
-    fill: transparent;
+    fill: red;
+    opacity: 0.5;
 }
 
 svg.paint circle.blink-point {
