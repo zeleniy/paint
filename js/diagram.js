@@ -1,3 +1,8 @@
+function log() {
+  Array.from(arguments).forEach(function(d) {
+    d3.select('body').append('div').text(d);
+  })
+}
 /**
  * @author Zelenin Alexandr <zeleniy.spb@gmail.com>
  * @public
@@ -191,7 +196,7 @@ Diagram.prototype._resize = function(dimension) {
      */
     this._width  = dimension.width || this._defaults.width;
     this._height = this._width * this._imageData.height / this._imageData.width;
-    console.log(this._width, this._pointRadius)
+    log(this._width, this._pointRadius)
     /*
      * Configure scale functions.
      */
