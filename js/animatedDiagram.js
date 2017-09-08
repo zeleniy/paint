@@ -327,7 +327,7 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
     this._scrollText = this._scrollContainer
         .append('text')
         .attr('class', 'scroll-text')
-        .text('slide for å bøye tidrom');
+        .text('Dra først spaken opp og bøy tidrom');
     /*
      * Populate chart with data.
      */
