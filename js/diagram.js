@@ -191,6 +191,7 @@ Diagram.prototype._resize = function(dimension) {
      */
     this._width  = dimension.width || this._defaults.width;
     this._height = this._width * this._imageData.height / this._imageData.width;
+    console.log(this._width, this._pointRadius)
     /*
      * Configure scale functions.
      */
