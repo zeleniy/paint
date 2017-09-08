@@ -99,7 +99,13 @@ AnimatedDiagram.prototype._update = function() {
     const axisHeight = this._height * this._axisHeightCoef;
     const handleHeight = axisHeight * 0.08;
     const axisWidth = this._sliderScale(this._width);
-    const axisOffset = this._scrollText.node().getBoundingClientRect().width / 2 + 10 + axisWidth / 2;
+
+    this._scrollText
+        .attr('x', this._width - axisWidth)
+        .attr('y', this._height - axisWidth)
+        .style('font-size', this._fontScale(this._width) + 'px');
+
+    const axisOffset = this._scrollText.node().getBoundingClientRect().width / 2 + axisWidth;
 
     this._axis
         .attr('x', this._width - axisOffset)
@@ -113,7 +119,9 @@ AnimatedDiagram.prototype._update = function() {
         .attr('y2', (d, i) => ((this._height - axisHeight) / 2) + axisHeight / 3 * i);
 
     const handleProtrusion = 2;
-    const surfaceHeight = handleHeight * 1.5;
+    // const surfaceHeight = handleHeight * 1.5;
+    const surfaceHeight = 50;
+    console.log(surfaceHeight)
     const y = this._getHandlePosition();
 
     this._axisHandle
@@ -141,11 +149,6 @@ AnimatedDiagram.prototype._update = function() {
                this._handleDragEndEventHandler()
             }.bind(this))
         );
-
-        this._scrollText
-            .attr('x', this._width - axisOffset)
-            .attr('y', this._height - axisWidth)
-            .style('font-size', this._fontScale(this._width) + 'px');
 };
 
 
@@ -310,7 +313,7 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
     this._axisHandleSurface = this._scrollContainer
         .append('rect')
         .attr('class', 'scroll-axis-handle-surface')
-        .style('opacity', 0);
+        .style('opacity', 0.2);
     this._axisHandle = this._scrollContainer
         .append('rect')
         .attr('class', 'scroll-axis-handle')

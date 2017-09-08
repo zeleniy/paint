@@ -21,8 +21,11 @@ svg.paint .scroll-axis-handle {
     fill: #efefef;
     stroke: #000;
     stroke-width: 1;
-    cursor: pointer;
     pointer-events: none;
+}
+
+svg.paint .scroll-axis-handle-surface {
+  cursor: ns-resize;
 }
 
 svg.paint path.user-path {
@@ -64,7 +67,7 @@ svg.paint text.copyright {
 }
 
 svg.paint text.scroll-text {
-    text-anchor: middle;
+    text-anchor: end;
 }
 
 svg.paint circle.scroll-pointer {
