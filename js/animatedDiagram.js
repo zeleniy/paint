@@ -27,6 +27,7 @@ function AnimatedDiagram() {
      */
     this._step = 80;
     this._axisHeightCoef = 0.8;
+    this._surfaceSize = 40;
     /**
      * Virtual y offset.
      * @private
@@ -119,9 +120,6 @@ AnimatedDiagram.prototype._update = function() {
         .attr('y2', (d, i) => ((this._height - axisHeight) / 2) + axisHeight / 3 * i);
 
     const handleProtrusion = 2;
-    // const surfaceHeight = handleHeight * 1.5;
-    const surfaceHeight = 50;
-    console.log(surfaceHeight)
     const y = this._getHandlePosition();
 
     this._axisHandle
@@ -130,10 +128,10 @@ AnimatedDiagram.prototype._update = function() {
         .attr('width', axisWidth + handleProtrusion * 2)
         .attr('height', handleHeight);
     this._axisHandleSurface
-        .attr('x', this._width - axisOffset - surfaceHeight / 2 + axisWidth / 2)
-        .attr('y', y - (surfaceHeight - handleHeight) / 2)
-        .attr('width', surfaceHeight)
-        .attr('height', surfaceHeight)
+        .attr('x', this._width - axisOffset - this._surfaceSize / 2 + axisWidth / 2)
+        .attr('y', y - (this._surfaceSize - handleHeight) / 2)
+        .attr('width', this._surfaceSize)
+        .attr('height', this._surfaceSize)
         .call(d3.drag()
             .subject(function(d, i, nodes) {
                 var handleRect = d3.select(nodes[0]);
@@ -164,10 +162,9 @@ AnimatedDiagram.prototype._handleDragEventHandler = function() {
 
     const axisHeight = this._height * this._axisHeightCoef;
     const handleHeight = axisHeight * 0.08;
-    const surfaceHeight = handleHeight * 1.5;
 
     this._axisHandle.attr('y', y);
-    this._axisHandleSurface.attr('y', y - (surfaceHeight - handleHeight) / 2);
+    this._axisHandleSurface.attr('y', y - (this._surfaceSize - handleHeight) / 2);
 
     var index = d3.range(0, 3).filter(function(d, i) {
         return y >= this._getHandlePosition(d + 1) && y <= this._getHandlePosition(d);
@@ -181,10 +178,10 @@ AnimatedDiagram.prototype._handleDragEventHandler = function() {
 
     if (y > min) {
         // this._axisHandle.attr('y', max);
-        // this._axisHandleSurface.attr('y', max - (surfaceHeight - handleHeight) / 2);
+        // this._axisHandleSurface.attr('y', max - (this._surfaceSize - handleHeight) / 2);
     } else {
         // this._axisHandle.attr('y', min);
-        // this._axisHandleSurface.attr('y', min - (surfaceHeight - handleHeight) / 2);
+        // this._axisHandleSurface.attr('y', min - (this._surfaceSize - handleHeight) / 2);
         index ++;
     }
     /*
@@ -222,14 +219,13 @@ AnimatedDiagram.prototype._handleDragEndEventHandler = function() {
 
     const axisHeight = this._height * this._axisHeightCoef;
     const handleHeight = axisHeight * 0.08;
-    const surfaceHeight = handleHeight * 1.5;
 
     if (y > middle) {
         this._axisHandle.attr('y', max);
-        this._axisHandleSurface.attr('y', max - (surfaceHeight - handleHeight) / 2);
+        this._axisHandleSurface.attr('y', max - (this._surfaceSize - handleHeight) / 2);
     } else {
         this._axisHandle.attr('y', min);
-        this._axisHandleSurface.attr('y', min - (surfaceHeight - handleHeight) / 2);
+        this._axisHandleSurface.attr('y', min - (this._surfaceSize - handleHeight) / 2);
         index ++;
     }
     /*
@@ -313,7 +309,7 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
     this._axisHandleSurface = this._scrollContainer
         .append('rect')
         .attr('class', 'scroll-axis-handle-surface')
-        .style('opacity', 0.2);
+        .style('opacity', 0);
     this._axisHandle = this._scrollContainer
         .append('rect')
         .attr('class', 'scroll-axis-handle')
