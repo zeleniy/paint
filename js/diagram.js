@@ -293,7 +293,7 @@ Diagram.prototype.renderTo = function(selection) {
     this._showAnswerButton = this._container.append('button')
         .attr('class', 'btn btn-primary pull-right')
         .style('visibility', 'hidden')
-        .text('Vis svar')
+        .text('vis svar')
         .on('click', function() {
             self.showAnswer();
         });
@@ -301,7 +301,7 @@ Diagram.prototype.renderTo = function(selection) {
     this._resetButton = this._container.append('button')
         .attr('class', 'btn btn-primary pull-right')
         .style('visibility', 'hidden')
-        .text('Reset')
+        .text('tilbakestill')
         .on('click', function() {
             self.reset();
         });
