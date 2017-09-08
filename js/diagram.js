@@ -361,9 +361,10 @@ Diagram.prototype.getAnswerImage = function() {
  */
 Diagram.prototype.showAnswerButton = function() {
     /*
-     * Change button CSS "visibility" property.
+     * Change buttons CSS "visibility" property.
      */
     this._showAnswerButton.style('visibility', 'visible');
+    this._resetButton.style('visibility', 'visible');
 };
 
 
@@ -397,6 +398,7 @@ Diagram.prototype.reset = function() {
      * Disable button.
      */
     this._showAnswerButton.style('visibility', 'hidden');
+    this._resetButton.style('visibility', 'hidden');
     /*
      * Reset trace data.
      */
@@ -440,10 +442,10 @@ Diagram.prototype._dragStartEventHandler = function() {
      * Reset flag.
      */
     this._isFinished = false;
-    /*
-     * Show reset button.
-     */
-    this._resetButton.style('visibility', 'visible');
+    // /*
+    //  * Show reset button.
+    //  */
+    // this._resetButton.style('visibility', 'visible');
     /*
      * Disable blinking.
      */
@@ -509,14 +511,14 @@ Diagram.prototype._isTargetAchieved = function() {
 
 
 /**
- * Drag start event handler.
+ * Drag end event handler.
  * @protected
  */
 Diagram.prototype._dragEndEventHandler = function() {
 
-    if (this._isFinished === true) {
+    // if (this._isFinished === true) {
         this.showAnswerButton();
-    }
+    // }
 };
 
 
