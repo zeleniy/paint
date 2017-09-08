@@ -251,6 +251,11 @@ AnimatedDiagram.prototype._handleDragEndEventHandler = function() {
          * Enable painting.
          */
         this.enablePainting();
+        /*
+         * Show points.
+         */
+        this._startPoint.classed('start-point', true);
+        this._blinkPoint.classed('blink-point', true);
     } else {
         this._images[2].style('opacity', 0);
         this.disablePainting();
@@ -290,6 +295,11 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
      * Call parent method.
      */
     Diagram.prototype.renderTo.call(this, selection);
+    /*
+     * Hide points.
+     */
+    this._startPoint.classed('start-point', false);
+    this._blinkPoint.classed('blink-point', false);
     /*
      * Render scroll.
      */

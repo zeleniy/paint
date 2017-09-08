@@ -37,12 +37,17 @@ svg.paint path.user-path {
 }
 
 svg.paint circle.point {
+    fill: transparent;
+}
+
+svg.paint circle.start-point {
     fill: red;
     opacity: 0.5;
 }
 
 svg.paint circle.blink-point {
     fill: red;
+    opacity: 0.5;
     pointer-events: none;
     animation-iteration-count: infinite;
     animation-name: blink;
