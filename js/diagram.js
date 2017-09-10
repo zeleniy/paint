@@ -420,7 +420,9 @@ Diagram.prototype.reset = function() {
     /*
      * Remove answer background image.
      */
-    this._images[1].attr('xlink:href', null);
+    this._images[1]
+        .attr('xlink:href', null)
+        .style('display', null);
     /*
      * Enable painting if was disabled.
      */
