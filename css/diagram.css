@@ -6,6 +6,10 @@ svg.paint {
     border: 1px solid black;
 }
 
+svg.paint image {
+    display: none;
+}
+
 svg.paint .scroll-axis {
     fill: #cccccc;
     stroke: #000;

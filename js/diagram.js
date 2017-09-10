@@ -264,7 +264,9 @@ Diagram.prototype.renderTo = function(selection) {
         var image = this._svg.append('image');
 
         if (i == 0) {
-            image.attr('xlink:href', this._imagesLinks[0]);
+            image
+                .attr('xlink:href', this._imagesLinks[0])
+                .style('display', 'block');
         }
 
         this._images.push(image);
@@ -379,7 +381,9 @@ Diagram.prototype.showAnswer = function() {
     /*
      * Change background image.
      */
-    this._images[1].attr('xlink:href', this.getAnswerImage());
+    this._images[1]
+        .attr('xlink:href', this.getAnswerImage())
+        .style('display', 'block');
     /*
      * Set default mouse cursor and remove drag event handling from start point.
      */
