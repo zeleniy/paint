@@ -96,17 +96,19 @@ AnimatedDiagram.prototype._update = function() {
      */
     Diagram.prototype._update.call(this);
 
-    const tickProtrusion = 5;
-    const axisHeight = this._height * this._axisHeightCoef;
-    const handleHeight = axisHeight * 0.08;
-    const axisWidth = this._sliderScale(this._width);
+    var self = this;
+
+    var tickProtrusion = 5;
+    var axisHeight = this._height * this._axisHeightCoef;
+    var handleHeight = axisHeight * 0.08;
+    var axisWidth = this._sliderScale(this._width);
 
     this._scrollText
         .attr('x', this._width - axisWidth)
         .attr('y', this._height - axisWidth)
         .style('font-size', this._fontScale(this._width) + 'px');
 
-    const axisOffset = this._scrollText.node().getBoundingClientRect().width / 2 + axisWidth;
+    var axisOffset = this._scrollText.node().getBoundingClientRect().width / 2 + axisWidth;
 
     this._axis
         .attr('x', this._width - axisOffset)
@@ -115,12 +117,15 @@ AnimatedDiagram.prototype._update = function() {
         .attr('height', axisHeight);
     this._axisTicks
         .attr('x1', this._width - axisOffset - tickProtrusion)
-        .attr('y1', (d, i) => ((this._height - axisHeight) / 2) + axisHeight / 3 * i)
-        .attr('x2', this._width - axisOffset + axisWidth + tickProtrusion)
-        .attr('y2', (d, i) => ((this._height - axisHeight) / 2) + axisHeight / 3 * i);
+        .attr('y1', function(d, i) {
+            return ((self._height - axisHeight) / 2) + axisHeight / 3 * i;
+        }).attr('x2', this._width - axisOffset + axisWidth + tickProtrusion)
+        .attr('y2', function(d, i) {
+            return ((self._height - axisHeight) / 2) + axisHeight / 3 * i
+        });
 
-    const handleProtrusion = 2;
-    const y = this._getHandlePosition();
+    var handleProtrusion = 2;
+    var y = this._getHandlePosition();
 
     this._axisHandle
         .attr('x', this._width - axisOffset - handleProtrusion)
@@ -141,18 +146,17 @@ AnimatedDiagram.prototype._update = function() {
                 };
             })
             .on('drag', function() {
-               this._handleDragEventHandler()
-            }.bind(this))
-            .on('end', function() {
-               this._handleDragEndEventHandler()
-            }.bind(this))
+               self._handleDragEventHandler()
+            }).on('end', function() {
+               self._handleDragEndEventHandler()
+            })
         );
 };
 
 
 AnimatedDiagram.prototype._handleDragEventHandler = function() {
 
-    const y = Math.max(Math.min(d3.event.y, this._getHandlePosition(0)), this._getHandlePosition(3));
+    var y = Math.max(Math.min(d3.event.y, this._getHandlePosition(0)), this._getHandlePosition(3));
 
     if (y > this._y) {
         return;
@@ -160,8 +164,8 @@ AnimatedDiagram.prototype._handleDragEventHandler = function() {
 
     this._y = y;
 
-    const axisHeight = this._height * this._axisHeightCoef;
-    const handleHeight = axisHeight * 0.08;
+    var axisHeight = this._height * this._axisHeightCoef;
+    var handleHeight = axisHeight * 0.08;
 
     this._axisHandle.attr('y', y);
     this._axisHandleSurface.attr('y', y - (this._surfaceSize - handleHeight) / 2);
@@ -217,8 +221,8 @@ AnimatedDiagram.prototype._handleDragEndEventHandler = function() {
     var max = interval[0];
     var middle = min + (max - min) / 2;
 
-    const axisHeight = this._height * this._axisHeightCoef;
-    const handleHeight = axisHeight * 0.08;
+    var axisHeight = this._height * this._axisHeightCoef;
+    var handleHeight = axisHeight * 0.08;
 
     if (y > middle) {
         this._axisHandle.attr('y', max);
@@ -275,9 +279,9 @@ AnimatedDiagram.prototype._getHandlePosition = function(index) {
         index = this._index;
     }
 
-    const axisHeight = this._height * this._axisHeightCoef;
-    const handleHeight = axisHeight * 0.08;
-    const top = (this._height - axisHeight) / 2 - handleHeight / 2;
+    var axisHeight = this._height * this._axisHeightCoef;
+    var handleHeight = axisHeight * 0.08;
+    var top = (this._height - axisHeight) / 2 - handleHeight / 2;
 
     return top + (axisHeight / 3 * (3 - index));
 }

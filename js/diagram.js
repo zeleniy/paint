@@ -71,8 +71,11 @@ function Diagram() {
      * @member {Function}
      */
     this._lineGenerator = d3.line()
-        .x(d => this._getAbsoluteX(d.x))
-        .y(d => this._getAbsoluteY(d.y));
+        .x(function(d) {
+            return self._getAbsoluteX(d.x);
+        }).y(function(d) {
+            return self._getAbsoluteY(d.y);
+        });
     /**
      * Drag event handler.
      * @private
@@ -537,14 +540,21 @@ Diagram.prototype._redrawLine = function() {
         y: this._getRelativeY(this._imgYScale(this._startPointData[1]))
     };
 
+    var self = this;
     this._startPoint
         .datum([position.x, position.y])
-        .attr('cx', d => this._getAbsoluteX(d[0]))
-        .attr('cy', d => this._getAbsoluteY(d[1]));
+        .attr('cx', function(d) {
+            return self._getAbsoluteX(d[0]);
+        }).attr('cy', function(d) {
+            return self._getAbsoluteY(d[1]);
+        });
 
     this._blinkPoint
-        .attr('cx', d => this._imgXScale(d[0]))
-        .attr('cy', d => this._imgYScale(d[1]));
+        .attr('cx', function(d) {
+            return self._imgXScale(d[0]);
+        }).attr('cy', function(d) {
+            return self._imgYScale(d[1]);
+        });
 };
 
 
