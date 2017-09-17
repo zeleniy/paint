@@ -30,6 +30,7 @@ svg.paint .scroll-axis-handle {
 
 svg.paint .scroll-axis-handle-surface {
   cursor: ns-resize;
+  opacity: 0.2;
 }
 
 svg.paint path.user-path {

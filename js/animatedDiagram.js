@@ -20,20 +20,8 @@ function AnimatedDiagram() {
      * @member {Integer}
      */
     this._index = 0;
-    /**
-     * Scrolling/animation step.
-     * @private
-     * @member {Integer}
-     */
-    this._step = 80;
     this._axisHeightCoef = 0.8;
     this._surfaceSize = 40;
-    /**
-     * Virtual y offset.
-     * @private
-     * @member {Integer}
-     */
-    this._yOffset = 0;
     /**
      * Required images amount.
      * @protected
@@ -158,36 +146,19 @@ AnimatedDiagram.prototype._handleDragEventHandler = function() {
 
     var y = Math.max(Math.min(d3.event.y, this._getHandlePosition(0)), this._getHandlePosition(3));
 
-    if (y > this._y) {
-        return;
-    }
-
-    this._y = y;
-
     var axisHeight = this._height * this._axisHeightCoef;
     var handleHeight = axisHeight * 0.08;
 
     this._axisHandle.attr('y', y);
     this._axisHandleSurface.attr('y', y - (this._surfaceSize - handleHeight) / 2);
 
-    var index = d3.range(0, 3).filter(function(d, i) {
-        return y >= this._getHandlePosition(d + 1) && y <= this._getHandlePosition(d);
+    var half = (this._getHandlePosition(0) - this._getHandlePosition(1)) / 2;
+
+    var index = d3.range(0, 4).filter(function(d, i) {
+        var min = this._getHandlePosition(d + 1);
+        var max = this._getHandlePosition(d);
+        return y >= min + half && y <= max + half;
     }, this)[0];
-
-    var interval = [this._getHandlePosition(index), this._getHandlePosition(index + 1)];
-
-    var min = interval[1];
-    var max = interval[0];
-    var middle = min + (max - min) / 2;
-
-    if (y > min) {
-        // this._axisHandle.attr('y', max);
-        // this._axisHandleSurface.attr('y', max - (this._surfaceSize - handleHeight) / 2);
-    } else {
-        // this._axisHandle.attr('y', min);
-        // this._axisHandleSurface.attr('y', min - (this._surfaceSize - handleHeight) / 2);
-        index ++;
-    }
     /*
      * Update global index.
      */
@@ -203,11 +174,7 @@ AnimatedDiagram.prototype._handleDragEndEventHandler = function() {
 
     var y = Math.max(Math.min(d3.event.y, this._getHandlePosition(0)), this._getHandlePosition(3));
 
-    if (y < this._y) {
-        y = this._y;
-    }
-
-    var index = d3.range(0, 3).filter(function(d, i) {
+    var index = d3.range(0, 4).filter(function(d, i) {
         return y >= this._getHandlePosition(d + 1) && y <= this._getHandlePosition(d);
     }, this)[0];
 
@@ -230,7 +197,6 @@ AnimatedDiagram.prototype._handleDragEndEventHandler = function() {
     } else {
         this._axisHandle.attr('y', min);
         this._axisHandleSurface.attr('y', min - (this._surfaceSize - handleHeight) / 2);
-        index ++;
     }
     /*
      * Update global index.
@@ -309,8 +275,7 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
      */
     this._scrollContainer = this._svg
         .append('g')
-        .attr('class', 'scroll-container')
-        .style('opacity', 1);
+        .attr('class', 'scroll-container');
     this._axis = this._scrollContainer
         .append('rect')
         .attr('class', 'scroll-axis');
@@ -322,8 +287,7 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
         .attr('class', 'scroll-axis-tick');
     this._axisHandleSurface = this._scrollContainer
         .append('rect')
-        .attr('class', 'scroll-axis-handle-surface')
-        .style('opacity', 0);
+        .attr('class', 'scroll-axis-handle-surface');
     this._axisHandle = this._scrollContainer
         .append('rect')
         .attr('class', 'scroll-axis-handle')
