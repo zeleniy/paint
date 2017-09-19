@@ -80,6 +80,10 @@ svg.paint text.copyright {
     font-size: 10px;
 }
 
+svg.paint text.scroll-text {
+    text-anchor: end;
+}
+
 svg.paint text.axis-tick {
     text-anchor: start;
 }

@@ -3,11 +3,24 @@
  * @public
  * @class
  */
-function AnimatedDiagram() {
+function AnimatedBackwardDiagram() {
     /*
      * Call parent class constructor.
      */
     Diagram.call(this);
+    /**
+     * Images urls.
+     * @protected
+     * @member {String[]}
+     */
+    this._imagesLinks = [
+        'img/Warped diagram with red_line.png',
+        'img/Warped diagram 1 with red_line.png',
+        'img/Warped diagram 2 with red_line.png',
+        'img/Warped diagram 4 with red_line.png',
+        'img/Correct line 1_Warped diagram.png',
+        'img/Faded straigth diagram-01.png'
+    ];
     /**
      * Pointer max x coordinate.
      * @private
@@ -20,20 +33,8 @@ function AnimatedDiagram() {
      * @member {Integer}
      */
     this._index = 0;
-    /**
-     * Scrolling/animation step.
-     * @private
-     * @member {Integer}
-     */
-    this._step = 80;
     this._axisHeightCoef = 0.8;
     this._surfaceSize = 40;
-    /**
-     * Virtual y offset.
-     * @private
-     * @member {Integer}
-     */
-    this._yOffset = 0;
     /**
      * Required images amount.
      * @protected
@@ -52,7 +53,7 @@ function AnimatedDiagram() {
      */
      this._fontScale = d3.scaleLinear()
          .domain([200, 800])
-         .range([8, 14])
+         .range([4, 12])
          .clamp(true);
     /*
      * Preload images.
@@ -63,18 +64,18 @@ function AnimatedDiagram() {
 /*
  * Inherit Diagram class.
  */
-AnimatedDiagram.prototype = Object.create(Diagram.prototype);
+AnimatedBackwardDiagram.prototype = Object.create(Diagram.prototype);
 
 
 /**
  * Factory method.
  * @public
  * @static
- * @returns {AnimatedDiagram}
+ * @returns {AnimatedBackwardDiagram}
  */
-AnimatedDiagram.getInstance = function() {
+AnimatedBackwardDiagram.getInstance = function() {
 
-    return new AnimatedDiagram();
+    return new AnimatedBackwardDiagram();
 };
 
 
@@ -84,13 +85,24 @@ AnimatedDiagram.getInstance = function() {
  * @override
  * @returns {String}
  */
-AnimatedDiagram.prototype.getAnswerImage = function() {
+AnimatedBackwardDiagram.prototype.getAnswerImage = function() {
 
     return this._imagesLinks[4];
 };
 
 
-AnimatedDiagram.prototype._update = function() {
+/**
+ * Get icon size.
+ * @public
+ * @returns {Number}
+ */
+AnimatedBackwardDiagram.prototype._getIconSize = function() {
+
+    return Math.min(this._width / 8, 100);
+}
+
+
+AnimatedBackwardDiagram.prototype._update = function() {
     /*
      * Call parent method.
      */
@@ -103,12 +115,36 @@ AnimatedDiagram.prototype._update = function() {
     var handleHeight = axisHeight * 0.08;
     var axisWidth = this._sliderScale(this._width);
 
-    this._scrollText
-        .attr('x', this._width - axisWidth)
-        .attr('y', this._height - axisWidth)
-        .style('font-size', this._fontScale(this._width) + 'px');
+    var iconSize = this._getIconSize();
+    this._icons
+        .attr('width', iconSize)
+        .attr('height', iconSize)
+        .attr('x', this._width - iconSize)
+        .attr('y', function(d, i) {
+            if (i == 0) {
+                return self._sliderScale(self._width);
+            } else {
+                return (self._height - axisHeight) / 2 + axisHeight - iconSize;
+            }
+        });
 
-    var axisOffset = this._scrollText.node().getBoundingClientRect().width / 2 + axisWidth;
+    this._axisLabels
+        .attr('y', function(d, i) {
+            if (i == 0) {
+                return (self._height - axisHeight) / 2;
+            } else {
+                return (self._height - axisHeight) / 2 + axisHeight;
+            }
+        }).style('font-size', this._fontScale(this._width) + 'px');
+
+    var axisOffset = this._axisLabels
+        .nodes()
+        .reduce(function(length, node) {
+            return Math.max(length, node.getBoundingClientRect().width * 0.75);
+        }, 0) + iconSize;
+
+    this._axisLabels
+        .attr('x', this._width - axisOffset + axisWidth + tickProtrusion * 2)
 
     this._axis
         .attr('x', this._width - axisOffset)
@@ -154,15 +190,9 @@ AnimatedDiagram.prototype._update = function() {
 };
 
 
-AnimatedDiagram.prototype._handleDragEventHandler = function() {
+AnimatedBackwardDiagram.prototype._handleDragEventHandler = function() {
 
     var y = Math.max(Math.min(d3.event.y, this._getHandlePosition(0)), this._getHandlePosition(3));
-
-    if (y > this._y) {
-        return;
-    }
-
-    this._y = y;
 
     var axisHeight = this._height * this._axisHeightCoef;
     var handleHeight = axisHeight * 0.08;
@@ -170,24 +200,13 @@ AnimatedDiagram.prototype._handleDragEventHandler = function() {
     this._axisHandle.attr('y', y);
     this._axisHandleSurface.attr('y', y - (this._surfaceSize - handleHeight) / 2);
 
-    var index = d3.range(0, 3).filter(function(d, i) {
-        return y >= this._getHandlePosition(d + 1) && y <= this._getHandlePosition(d);
+    var half = (this._getHandlePosition(0) - this._getHandlePosition(1)) / 2;
+
+    var index = d3.range(0, 4).filter(function(d, i) {
+        var min = this._getHandlePosition(d + 1);
+        var max = this._getHandlePosition(d);
+        return y >= min + half && y <= max + half;
     }, this)[0];
-
-    var interval = [this._getHandlePosition(index), this._getHandlePosition(index + 1)];
-
-    var min = interval[1];
-    var max = interval[0];
-    var middle = min + (max - min) / 2;
-
-    if (y > min) {
-        // this._axisHandle.attr('y', max);
-        // this._axisHandleSurface.attr('y', max - (this._surfaceSize - handleHeight) / 2);
-    } else {
-        // this._axisHandle.attr('y', min);
-        // this._axisHandleSurface.attr('y', min - (this._surfaceSize - handleHeight) / 2);
-        index ++;
-    }
     /*
      * Update global index.
      */
@@ -199,15 +218,11 @@ AnimatedDiagram.prototype._handleDragEventHandler = function() {
 }
 
 
-AnimatedDiagram.prototype._handleDragEndEventHandler = function() {
+AnimatedBackwardDiagram.prototype._handleDragEndEventHandler = function() {
 
     var y = Math.max(Math.min(d3.event.y, this._getHandlePosition(0)), this._getHandlePosition(3));
 
-    if (y < this._y) {
-        y = this._y;
-    }
-
-    var index = d3.range(0, 3).filter(function(d, i) {
+    var index = d3.range(0, 4).filter(function(d, i) {
         return y >= this._getHandlePosition(d + 1) && y <= this._getHandlePosition(d);
     }, this)[0];
 
@@ -230,7 +245,6 @@ AnimatedDiagram.prototype._handleDragEndEventHandler = function() {
     } else {
         this._axisHandle.attr('y', min);
         this._axisHandleSurface.attr('y', min - (this._surfaceSize - handleHeight) / 2);
-        index ++;
     }
     /*
      * Update global index.
@@ -273,7 +287,7 @@ AnimatedDiagram.prototype._handleDragEndEventHandler = function() {
  * @param {Integer} [index]
  * @returns {Number}
  */
-AnimatedDiagram.prototype._getHandlePosition = function(index) {
+AnimatedBackwardDiagram.prototype._getHandlePosition = function(index) {
 
     if (index == undefined) {
         index = this._index;
@@ -294,7 +308,7 @@ AnimatedDiagram.prototype._getHandlePosition = function(index) {
  * @param {String} selection
  * @returns {Diagram}
  */
-AnimatedDiagram.prototype.renderTo = function(selection) {
+AnimatedBackwardDiagram.prototype.renderTo = function(selection) {
     /*
      * Call parent method.
      */
@@ -309,8 +323,7 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
      */
     this._scrollContainer = this._svg
         .append('g')
-        .attr('class', 'scroll-container')
-        .style('opacity', 1);
+        .attr('class', 'scroll-container');
     this._axis = this._scrollContainer
         .append('rect')
         .attr('class', 'scroll-axis');
@@ -322,18 +335,28 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
         .attr('class', 'scroll-axis-tick');
     this._axisHandleSurface = this._scrollContainer
         .append('rect')
-        .attr('class', 'scroll-axis-handle-surface')
-        .style('opacity', 0);
+        .attr('class', 'scroll-axis-handle-surface');
     this._axisHandle = this._scrollContainer
         .append('rect')
         .attr('class', 'scroll-axis-handle')
         .attr('rx', 2);
-    this._scrollText = this._scrollContainer
+    this._axisLabels = this._scrollContainer
+        .selectAll('text')
+        .data(['krum', 'ikke-krum'])
+        .enter()
         .append('text')
-        .attr('class', 'scroll-text')
-        .text('Dra først spaken opp og bøy tidrom');
+        .attr('class', 'axis-tick')
+        .attr('dy', '0.3em')
+        .text(String);
+    this._icons = this._scrollContainer
+        .selectAll('image.icon')
+        .data(['img/icons/Einstein.png', 'img/icons/Newton.png'])
+        .enter()
+        .append('image')
+        .attr('class', 'icon')
+        .attr('xlink:href', String);
     /*
-     * Populate chart with data.
+     * Update chart.
      */
     this._update();
 };
