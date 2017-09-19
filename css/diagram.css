@@ -10,6 +10,10 @@ svg.paint image {
     display: none;
 }
 
+svg.paint image.icon {
+    display: block;
+}
+
 svg.paint .scroll-axis {
     fill: #cccccc;
     stroke: #000;
@@ -30,7 +34,7 @@ svg.paint .scroll-axis-handle {
 
 svg.paint .scroll-axis-handle-surface {
   cursor: ns-resize;
-  opacity: 0.2;
+  opacity: 0;
 }
 
 svg.paint path.user-path {
@@ -76,8 +80,8 @@ svg.paint text.copyright {
     font-size: 10px;
 }
 
-svg.paint text.scroll-text {
-    text-anchor: end;
+svg.paint text.axis-tick {
+    text-anchor: start;
 }
 
 svg.paint circle.scroll-pointer {

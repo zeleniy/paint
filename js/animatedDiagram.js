@@ -78,6 +78,12 @@ AnimatedDiagram.prototype.getAnswerImage = function() {
 };
 
 
+AnimatedDiagram.prototype._getIconSize = function() {
+
+    return Math.min(this._width / 8, 100);
+}
+
+
 AnimatedDiagram.prototype._update = function() {
     /*
      * Call parent method.
@@ -91,12 +97,36 @@ AnimatedDiagram.prototype._update = function() {
     var handleHeight = axisHeight * 0.08;
     var axisWidth = this._sliderScale(this._width);
 
-    this._scrollText
-        .attr('x', this._width - axisWidth)
-        .attr('y', this._height - axisWidth)
-        .style('font-size', this._fontScale(this._width) + 'px');
+    var iconSize = this._getIconSize();
+    this._icons
+        .attr('width', iconSize)
+        .attr('height', iconSize)
+        .attr('x', this._width - iconSize)
+        .attr('y', function(d, i) {
+            if (i == 0) {
+                return self._sliderScale(self._width);
+            } else {
+                return (self._height - axisHeight) / 2 + axisHeight - iconSize;
+            }
+        });
 
-    var axisOffset = this._scrollText.node().getBoundingClientRect().width / 2 + axisWidth;
+    this._axisLabels
+        .attr('y', function(d, i) {
+            if (i == 0) {
+                return (self._height - axisHeight) / 2;
+            } else {
+                return (self._height - axisHeight) / 2 + axisHeight;
+            }
+        }).style('font-size', this._fontScale(this._width) + 'px');
+
+    var axisOffset = this._axisLabels
+        .nodes()
+        .reduce(function(length, node) {
+            return Math.max(length, node.getBoundingClientRect().width * 0.75);
+        }, 0) + iconSize;
+
+    this._axisLabels
+        .attr('x', this._width - axisOffset + axisWidth + tickProtrusion * 2)
 
     this._axis
         .attr('x', this._width - axisOffset)
@@ -292,12 +322,23 @@ AnimatedDiagram.prototype.renderTo = function(selection) {
         .append('rect')
         .attr('class', 'scroll-axis-handle')
         .attr('rx', 2);
-    this._scrollText = this._scrollContainer
+    this._axisLabels = this._scrollContainer
+        .selectAll('text')
+        .data(['krum', 'ikke-krum'])
+        .enter()
         .append('text')
-        .attr('class', 'scroll-text')
-        .text('Dra først spaken opp og bøy tidrom');
+        .attr('class', 'axis-tick')
+        .attr('dy', '0.3em')
+        .text(String);
+    this._icons = this._scrollContainer
+        .selectAll('image.icon')
+        .data(['img/icons/Einstein.png', 'img/icons/Newton.png'])
+        .enter()
+        .append('image')
+        .attr('class', 'icon')
+        .attr('xlink:href', String);
     /*
-     * Populate chart with data.
+     * Update chart.
      */
     this._update();
 };
