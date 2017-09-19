@@ -40,7 +40,7 @@ function AnimatedDiagram() {
      */
      this._fontScale = d3.scaleLinear()
          .domain([200, 800])
-         .range([8, 14])
+         .range([4, 12])
          .clamp(true);
     /*
      * Preload images.
@@ -78,6 +78,11 @@ AnimatedDiagram.prototype.getAnswerImage = function() {
 };
 
 
+/**
+ * Get icon size.
+ * @public
+ * @returns {Number}
+ */
 AnimatedDiagram.prototype._getIconSize = function() {
 
     return Math.min(this._width / 8, 100);
