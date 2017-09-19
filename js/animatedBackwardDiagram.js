@@ -140,7 +140,7 @@ AnimatedBackwardDiagram.prototype._update = function() {
     var axisOffset = this._axisLabels
         .nodes()
         .reduce(function(length, node) {
-            return Math.max(length, node.getBoundingClientRect().width * 0.75);
+            return Math.max(length, node.getBoundingClientRect().width * 0.9);
         }, 0) + iconSize;
 
     this._axisLabels
