@@ -32,7 +32,7 @@ function AnimatedBackwardDiagram() {
      * @private
      * @member {Integer}
      */
-    this._index = 0;
+    this._index = 3;
     this._axisHeightCoef = 0.8;
     this._surfaceSize = 40;
     /**
@@ -311,6 +311,10 @@ AnimatedBackwardDiagram.prototype.renderTo = function(selection) {
     this._blinkPoint.remove();
     this._showAnswerButton.remove();
     this._resetButton.remove();
+    /*
+     * Replace background image.
+     */
+    this._images[0].attr('xlink:href', this._imagesLinks[3]);
     /*
      * Render scroll.
      */
