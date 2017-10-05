@@ -180,12 +180,7 @@ AnimatedDiagram.prototype._handleDragEventHandler = function() {
     var max = interval[0];
     var middle = min + (max - min) / 2;
 
-    if (y > min) {
-        // this._axisHandle.attr('y', max);
-        // this._axisHandleSurface.attr('y', max - (this._surfaceSize - handleHeight) / 2);
-    } else {
-        // this._axisHandle.attr('y', min);
-        // this._axisHandleSurface.attr('y', min - (this._surfaceSize - handleHeight) / 2);
+    if (y <= min) {
         index ++;
     }
     /*

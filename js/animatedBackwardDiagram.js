@@ -265,15 +265,6 @@ AnimatedBackwardDiagram.prototype._handleDragEndEventHandler = function() {
             .transition()
             .duration(1500)
             .style('opacity', 1);
-        /*
-         * Enable painting.
-         */
-        this.enablePainting();
-        /*
-         * Show points.
-         */
-        this._startPoint.classed('start-point', true);
-        this._blinkPoint.classed('blink-point', true);
     } else {
         this._images[2].style('opacity', 0);
         this.disablePainting();
@@ -314,10 +305,12 @@ AnimatedBackwardDiagram.prototype.renderTo = function(selection) {
      */
     Diagram.prototype.renderTo.call(this, selection);
     /*
-     * Hide points.
+     * Remove some unused controls.
      */
-    this._startPoint.classed('start-point', false);
-    this._blinkPoint.classed('blink-point', false);
+    this._startPoint.remove();
+    this._blinkPoint.remove();
+    this._showAnswerButton.remove();
+    this._resetButton.remove();
     /*
      * Render scroll.
      */
